@@ -1,0 +1,26 @@
+# Build folders
+/build/
+/cmake-build-*/
+/out/
+
+# Visual Studio Code
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+*.cmake
+Makefile
+
+# Compiled binaries
+*.exe
+*.out
+*.o
+*.obj
+
+# GLFW / GLAD build artifacts (if any appear inside repo)
+_deps/
