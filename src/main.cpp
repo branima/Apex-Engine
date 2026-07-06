@@ -1,6 +1,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <iostream>
 #include <cmath>
 
@@ -157,8 +161,8 @@ int main()
     Shader myShader("shaders/shader.vs", "shaders/shader.fs");
 
     myShader.use();
-    glUniform1i(glGetUniformLocation(myShader.ID, "texture1"), 0);
-    myShader.setInt("texture2", 1); // or with shader class
+    myShader.setInt("texture1", 0);
+    myShader.setInt("texture2", 1);
 
     // Render loop
     while (!glfwWindowShouldClose(window))
@@ -171,6 +175,12 @@ int main()
 
         // Render a triangle
         renderShape(VAO, myShader, texture1, texture2);
+
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        unsigned int transformLoc = glGetUniformLocation(myShader.ID, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
         glfwSwapBuffers(window);
         glfwPollEvents();
