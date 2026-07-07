@@ -2,7 +2,10 @@
 
 #include <iostream>
 
-void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+static void framebufferSizeCallback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
 
 Apex::Window::Window()
 {
@@ -15,17 +18,14 @@ Apex::Window::Window()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 
-Apex::Window::Window(const int width, const int height, const char* title)
+Apex::Window::Window(int width, int height, const char* title)
+    : Window()
 {
-    Window();
-
     // Create window
     m_WindowInstance = glfwCreateWindow(width, height, title, NULL, NULL);
     if (m_WindowInstance == NULL)
     {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return;
+        throw std::runtime_error("Failed to create window.");
     }
 
     glfwMakeContextCurrent(m_WindowInstance);
@@ -33,8 +33,7 @@ Apex::Window::Window(const int width, const int height, const char* title)
     // Load OpenGL functions with GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return;
+        throw std::runtime_error("Failed to initialize GLAD.");
     }
 
     // Set viewport
@@ -43,22 +42,23 @@ Apex::Window::Window(const int width, const int height, const char* title)
     glfwSetFramebufferSizeCallback(m_WindowInstance, framebufferSizeCallback);
 }
 
-bool Apex::Window::isInstanceValid()
+Apex::Window::~Window()
 {
-    return m_WindowInstance != NULL;
+    glfwDestroyWindow(m_WindowInstance);
+    glfwTerminate();
 }
 
-bool Apex::Window::getShouldWindowClose()
+bool Apex::Window::getShouldWindowClose() const
 {
     return glfwWindowShouldClose(m_WindowInstance);
 }
 
-void Apex::Window::setShouldWindowClose(const bool value)
+void Apex::Window::setShouldWindowClose(bool value)
 {
     glfwSetWindowShouldClose(m_WindowInstance, value);
 }
 
-bool Apex::Window::isKeyPressed(int key)
+bool Apex::Window::isKeyPressed(int key) const
 {
     return glfwGetKey(m_WindowInstance, key) == GLFW_PRESS;
 }
@@ -66,9 +66,4 @@ bool Apex::Window::isKeyPressed(int key)
 void Apex::Window::SwapBuffers()
 {
     glfwSwapBuffers(m_WindowInstance);
-}
-
-void framebufferSizeCallback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
 }

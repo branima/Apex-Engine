@@ -16,6 +16,7 @@ FetchContent_MakeAvailable(glfw)
 
 add_executable(ApexEngine
     engine/core/window.cpp
+    engine/core/application.cpp
     src/main.cpp
     src/stb_image.cpp
     external/glad/src/glad.c

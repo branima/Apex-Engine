@@ -7,16 +7,14 @@ namespace Apex
     {
         public:
             Window();
-            Window(const int width, const int height, const char* title);
+            Window(int width, int height, const char* title);
+            ~Window();
 
-            // Utility
-            bool isInstanceValid();
-
-            bool getShouldWindowClose();
-            void setShouldWindowClose(const bool value);
+            bool getShouldWindowClose() const;
+            void setShouldWindowClose(bool value);
 
             // Input
-            bool isKeyPressed(int key);
+            bool isKeyPressed(int key) const;
 
             // Rendering
             void SwapBuffers();
