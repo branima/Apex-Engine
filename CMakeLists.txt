@@ -15,6 +15,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glfw)
 
 add_executable(ApexEngine
+    engine/core/window.cpp
     src/main.cpp
     src/stb_image.cpp
     external/glad/src/glad.c
@@ -22,6 +23,7 @@ add_executable(ApexEngine
 
 target_include_directories(ApexEngine PRIVATE
     includes
+    engine/core
     external/glad/include
     external/glm
 )

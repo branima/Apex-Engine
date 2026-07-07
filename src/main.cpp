@@ -11,18 +11,15 @@
 #include "stb_image.h"
 #include "shader.h"
 
+#include "window.h"
+
 using namespace std;
 
-void framebufferSizeCallback(GLFWwindow* window, int width, int height)
+void processInput(Apex::Window& window)
 {
-    glViewport(0, 0, width, height);
-}
-
-void processInput(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (window.isKeyPressed(GLFW_KEY_ESCAPE))
     {
-        glfwSetWindowShouldClose(window, true);
+        window.setShouldWindowClose(true);
     }
 }
 
@@ -120,36 +117,12 @@ void renderShape(unsigned int& VAO, Shader& shader, unsigned int& texture1, unsi
 
 int main()
 {
-    // Initialize GLFW
-    glfwInit();
-
-    // Tell GLFW we want OpenGL 3.3 Core Profile
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    // Create window
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Apex Engine", NULL, NULL);
-    if (window == NULL)
+    Apex::Window window = Apex::Window(800, 600, "Apex Engine");
+    if (!window.isInstanceValid())
     {
-        cout << "Failed to create GLFW window" << endl;
-        glfwTerminate();
+        cout << "Window instance is not valid!" << endl;
         return -1;
     }
-
-    glfwMakeContextCurrent(window);
-
-    // Load OpenGL functions with GLAD
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        cout << "Failed to initialize GLAD" << endl;
-        return -1;
-    }
-
-    // Set viewport
-    glViewport(0, 0, 800, 600);
-
-    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
     //Prepare shaders and vertex information before render loop
     unsigned int VBO, VAO, EBO, texture1, texture2;
@@ -165,7 +138,7 @@ int main()
     myShader.setInt("texture2", 1);
 
     // Render loop
-    while (!glfwWindowShouldClose(window))
+    while (!window.getShouldWindowClose())
     {
         // Input: escape closes window
         processInput(window);
@@ -182,7 +155,7 @@ int main()
         unsigned int transformLoc = glGetUniformLocation(myShader.ID, "transform");
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
-        glfwSwapBuffers(window);
+        window.SwapBuffers();
         glfwPollEvents();
     }
 
