@@ -67,3 +67,8 @@ void Apex::Window::SwapBuffers()
 {
     glfwSwapBuffers(m_WindowInstance);
 }
+
+void Apex::Window::PollEvents()
+{
+        glfwPollEvents();
+}

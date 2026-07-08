@@ -15,8 +15,10 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glfw)
 
 add_executable(ApexEngine
-    engine/core/window.cpp
     engine/core/application.cpp
+    engine/core/shader.cpp
+    engine/core/texture.cpp
+    engine/core/window.cpp
     src/main.cpp
     src/stb_image.cpp
     external/glad/src/glad.c

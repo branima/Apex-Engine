@@ -13,6 +13,8 @@
 #include "stb_image.h"
 #include "shader.h"
 
+#include "texture.h"
+
 Apex::Application::Application()
 {
     m_WindowInstance = std::make_unique<Apex::Window>(800, 600, "Apex Engine");
@@ -30,34 +32,6 @@ void clearScreenWithColor()
 {
     glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void textureSetup(unsigned int& texture, const char* path)
-{
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    // set the texture wrapping/filtering options (on currently bound texture)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // load and generate the texture
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, nrChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-
-    // Free the image memory after we're done working with it
-    stbi_image_free(data);
 }
 
 void shapeSetup(unsigned int& VBO, unsigned int& VAO, unsigned int& EBO)
@@ -106,12 +80,10 @@ void shapeSetup(unsigned int& VBO, unsigned int& VAO, unsigned int& EBO)
     glBindVertexArray(0);
 }
 
-void renderShape(unsigned int& VAO, Shader& shader, unsigned int& texture1, unsigned int& texture2)
+void renderShape(unsigned int& VAO, Apex::Shader& shader, Apex::Texture& texture1, Apex::Texture& texture2)
 {
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture2);
+    texture1.bindToTextureUnit(GL_TEXTURE0);
+    texture2.bindToTextureUnit(GL_TEXTURE1);
 
     shader.use();
     glBindVertexArray(VAO);
@@ -121,12 +93,11 @@ void renderShape(unsigned int& VAO, Shader& shader, unsigned int& texture1, unsi
 void Apex::Application::run()
 {
     //Prepare shaders and vertex information before render loop
-    unsigned int VBO, VAO, EBO, texture1, texture2;
+    unsigned int VBO, VAO, EBO;
     shapeSetup(VBO, VAO, EBO);
 
-    stbi_set_flip_vertically_on_load(true);
-    textureSetup(texture1, "resources/textures/container.jpg"); // Texture class will be implemented in next commit
-    textureSetup(texture2, "resources/textures/awesomeface.png"); // Texture class will be implemented in next commit
+    Texture texture1("resources/textures/container.jpg");
+    Texture texture2("resources/textures/awesomeface.png", true);
 
     Shader myShader("shaders/shader.vs", "shaders/shader.fs");
     myShader.use();
@@ -148,16 +119,14 @@ void Apex::Application::run()
         glm::mat4 trans = glm::mat4(1.0f);
         trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
         trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        unsigned int transformLoc = glGetUniformLocation(myShader.ID, "transform");
+        unsigned int transformLoc = glGetUniformLocation(myShader.m_ID, "transform");
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
         m_WindowInstance->SwapBuffers();
-        glfwPollEvents();
+        m_WindowInstance->PollEvents();
     }
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    glDeleteTextures(1, &texture1);
-    glDeleteTextures(1, &texture2);
 }

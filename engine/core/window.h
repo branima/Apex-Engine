@@ -1,3 +1,5 @@
+#pragma once
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -18,6 +20,9 @@ namespace Apex
 
             // Rendering
             void SwapBuffers();
+
+            // Eventing
+            void PollEvents();
 
         private:
             GLFWwindow* m_WindowInstance = nullptr;
