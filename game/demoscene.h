@@ -1,19 +1,24 @@
 #pragma once
 
+#include "elementbuffer.h"
 #include "scene.h"
 #include "shader.h"
 #include "texture.h"
+#include "vertexarray.h"
+#include "vertexbuffer.h"
 
 class DemoScene : public Apex::Scene
 {
     public:
         DemoScene();
-        ~DemoScene();
+        ~DemoScene() = default;
 
         void OnRender() override;
 
     private:
-        unsigned int m_VBO, m_VAO, m_EBO;
+        Apex::VertexBuffer m_VtxBuffer;
+        Apex::ElementBuffer m_ElBuffer;
+        Apex::VertexArray m_VtxArray;
         Apex::Texture m_Texture1, m_Texture2;
         Apex::Shader m_Shader;
 };

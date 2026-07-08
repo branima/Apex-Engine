@@ -12,7 +12,7 @@
 
 #include "stb_image.h"
 
-void shapeSetup(unsigned int& VBO, unsigned int& VAO, unsigned int& EBO)
+void shapeSetup(Apex::VertexArray& vtxArray, Apex::VertexBuffer& vtxBuffer, Apex::ElementBuffer& elBuffer)
 {
     float vertices[] = {
         // positions // colors // texture coords
@@ -28,55 +28,46 @@ void shapeSetup(unsigned int& VBO, unsigned int& VAO, unsigned int& EBO)
     };
 
     // Vertex array setup
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    vtxArray.bind();
 
     // Vertex data buffer setup
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    vtxBuffer.bind();
+    vtxBuffer.setData(vertices, sizeof(vertices));
 
     // Element buffer setup
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    elBuffer.bind();
+    elBuffer.setData(indices, sizeof(indices));
 
     // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    vtxArray.setVertexAttribute(0, 3, 8 * sizeof(float), 0);
 
     // Color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    vtxArray.setVertexAttribute(1, 3, 8 * sizeof(float), 3 * sizeof(float));
 
     // Texture attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    vtxArray.setVertexAttribute(2, 2, 8 * sizeof(float), 6 * sizeof(float));
 
-    // Unbind buffers after usage
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    // Unbind buffers and arrays after usage
+    vtxBuffer.unbind();
+    vtxArray.unbind();
 }
 
 DemoScene::DemoScene()
 {
+    m_VtxArray = Apex::VertexArray();
+    m_VtxBuffer = Apex::VertexBuffer();
+    m_ElBuffer = Apex::ElementBuffer();
+
     m_Texture1 = Apex::Texture("resources/textures/container.jpg");
     m_Texture2 = Apex::Texture("resources/textures/awesomeface.png", true);
     m_Shader = Apex::Shader("shaders/shader.vs", "shaders/shader.fs");
 
     //Prepare shaders and vertex information before render loop
-    shapeSetup(m_VBO, m_VAO, m_EBO);
+    shapeSetup(m_VtxArray, m_VtxBuffer, m_ElBuffer);
 
     m_Shader.use();
     m_Shader.setInt("texture1", 0);
     m_Shader.setInt("texture2", 1);
-}
-
-DemoScene::~DemoScene()
-{
-    glDeleteVertexArrays(1, &m_VAO);
-    glDeleteBuffers(1, &m_VBO);
-    glDeleteBuffers(1, &m_EBO);
 }
 
 void clearScreenWithColor()
@@ -85,13 +76,13 @@ void clearScreenWithColor()
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void renderShape(unsigned int& VAO, Apex::Shader& shader, Apex::Texture& texture1, Apex::Texture& texture2)
+void renderShape(Apex::VertexArray& vtxArray, Apex::Shader& shader, Apex::Texture& texture1, Apex::Texture& texture2)
 {
     texture1.bindToTextureUnit(GL_TEXTURE0);
     texture2.bindToTextureUnit(GL_TEXTURE1);
 
     shader.use();
-    glBindVertexArray(VAO);
+    vtxArray.bind();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -106,5 +97,5 @@ void DemoScene::OnRender()
     m_Shader.setMat4("transform", trans);
 
     // Render a triangle
-    renderShape(m_VAO, m_Shader, m_Texture1, m_Texture2);
+    renderShape(m_VtxArray, m_Shader, m_Texture1, m_Texture2);
 }
