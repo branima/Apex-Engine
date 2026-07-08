@@ -1,5 +1,7 @@
 #include "shader.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -60,6 +62,23 @@ Apex::Shader::Shader(const char* vertexPath, const char* fragmentPath)
     glDeleteShader(fragment);
 }
 
+Apex::Shader::Shader(Shader&& other) noexcept
+{
+    m_ID = other.m_ID;
+    other.m_ID = 0;
+}
+
+Apex::Shader& Apex::Shader::operator=(Shader&& other) noexcept
+{
+    if (this != &other)
+    {
+        m_ID = other.m_ID;
+        other.m_ID = 0;
+    }
+
+    return *this;
+}
+
 void Apex::Shader::use()
 {
     glUseProgram(m_ID);
@@ -78,6 +97,11 @@ void Apex::Shader::setInt(const std::string &name, int value) const
 void Apex::Shader::setFloat(const std::string &name, float value) const
 {
     glUniform1f(glGetUniformLocation(m_ID, name.c_str()), value);
+}
+
+void Apex::Shader::setMat4(const std::string &name, const glm::mat4& matrix) const
+{
+    glUniformMatrix4fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void Apex::Shader::checkCompileErrors(GLuint shader, std::string type)

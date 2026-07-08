@@ -19,9 +19,10 @@ add_executable(ApexEngine
     engine/core/shader.cpp
     engine/core/texture.cpp
     engine/core/window.cpp
+    external/glad/src/glad.c
+    game/demoscene.cpp
     src/main.cpp
     src/stb_image.cpp
-    external/glad/src/glad.c
 )
 
 target_include_directories(ApexEngine PRIVATE
@@ -29,6 +30,7 @@ target_include_directories(ApexEngine PRIVATE
     engine/core
     external/glad/include
     external/glm
+    game
 )
 
 target_link_libraries(ApexEngine PRIVATE

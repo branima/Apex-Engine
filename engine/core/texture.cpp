@@ -41,6 +41,25 @@ Apex::Texture::~Texture()
     glDeleteTextures(1, &m_ID);
 }
 
+Apex::Texture::Texture(Texture&& other) noexcept
+{
+    m_ID = other.m_ID;
+    other.m_ID = 0;
+}
+
+Apex::Texture& Apex::Texture::operator=(Texture&& other) noexcept
+{
+    if (this != &other)
+    {
+        glDeleteTextures(1, &m_ID);
+
+        m_ID = other.m_ID;
+        other.m_ID = 0;
+    }
+
+    return *this;
+}
+
 void Apex::Texture::bindToTextureUnit(unsigned int unit)
 {
     glActiveTexture(unit);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 #include <string>
 
@@ -9,18 +10,28 @@ namespace Apex
     class Shader
     {
     public:
-        unsigned int m_ID;
-
+        Shader() = default;
         Shader(const char* vertexPath, const char* fragmentPath);
         ~Shader() = default;
 
+        Shader(const Shader&) = delete; // disable copy const
+        Shader& operator=(const Shader&) = delete;
+
+        Shader(Shader&& other) noexcept; // we want this and most of our engine classes to work with std::move, ownership decision
+        Shader& operator=(Shader&& other) noexcept;
+
         void use();
+
+        unsigned int GetID() const {return m_ID;}
 
         void setBool(const std::string &name, bool value) const;
         void setInt(const std::string &name, int value) const;
         void setFloat(const std::string &name, float value) const;
+        void setMat4(const std::string &name, const glm::mat4& matrix) const;
 
     private:
         void checkCompileErrors(GLuint shader, std::string type);
+
+        unsigned int m_ID;
     };
 }
