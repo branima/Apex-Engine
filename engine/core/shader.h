@@ -12,7 +12,7 @@ namespace Apex
     public:
         Shader() = default;
         Shader(const char* vertexPath, const char* fragmentPath);
-        ~Shader() = default;
+        ~Shader();
 
         Shader(const Shader&) = delete; // disable copy const
         Shader& operator=(const Shader&) = delete;
@@ -22,7 +22,7 @@ namespace Apex
 
         void use();
 
-        unsigned int GetID() const {return m_ID;}
+        unsigned int getID() const {return m_ID;}
 
         void setBool(const std::string &name, bool value) const;
         void setInt(const std::string &name, int value) const;
@@ -32,6 +32,6 @@ namespace Apex
     private:
         void checkCompileErrors(GLuint shader, std::string type);
 
-        unsigned int m_ID;
+        unsigned int m_ID{0};
     };
 }

@@ -62,6 +62,11 @@ Apex::Shader::Shader(const char* vertexPath, const char* fragmentPath)
     glDeleteShader(fragment);
 }
 
+Apex::Shader::~Shader()
+{
+    glDeleteProgram(m_ID);
+}
+
 Apex::Shader::Shader(Shader&& other) noexcept
 {
     m_ID = other.m_ID;
@@ -72,6 +77,8 @@ Apex::Shader& Apex::Shader::operator=(Shader&& other) noexcept
 {
     if (this != &other)
     {
+        glDeleteProgram(m_ID);
+
         m_ID = other.m_ID;
         other.m_ID = 0;
     }

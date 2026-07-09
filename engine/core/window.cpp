@@ -63,12 +63,12 @@ bool Apex::Window::isKeyPressed(int key) const
     return glfwGetKey(m_WindowInstance, key) == GLFW_PRESS;
 }
 
-void Apex::Window::SwapBuffers()
+void Apex::Window::swapBuffers()
 {
     glfwSwapBuffers(m_WindowInstance);
 }
 
-void Apex::Window::PollEvents()
+void Apex::Window::pollEvents()
 {
         glfwPollEvents();
 }

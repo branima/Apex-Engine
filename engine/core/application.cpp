@@ -23,9 +23,9 @@ void Apex::Application::run()
         // Input: escape closes window
         processInput(*m_WindowInstance);
 
-        m_CurrentScene->OnRender();
+        m_CurrentScene->onRender();
 
-        m_WindowInstance->SwapBuffers();
-        m_WindowInstance->PollEvents();
+        m_WindowInstance->swapBuffers();
+        m_WindowInstance->pollEvents();
     }
 }

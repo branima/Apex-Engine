@@ -7,6 +7,6 @@ namespace Apex
         public:
             virtual ~Scene() = default;
 
-            virtual void OnRender() = 0;
+            virtual void onRender() = 0;
     };
 }

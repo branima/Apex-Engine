@@ -19,10 +19,10 @@ namespace Apex
             bool isKeyPressed(int key) const;
 
             // Rendering
-            void SwapBuffers();
+            void swapBuffers();
 
             // Eventing
-            void PollEvents();
+            void pollEvents();
 
         private:
             GLFWwindow* m_WindowInstance = nullptr;

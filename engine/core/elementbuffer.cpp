@@ -36,7 +36,8 @@ void Apex::ElementBuffer::bind()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
 }
 
-void Apex::ElementBuffer::setData(const unsigned int* data, int dataSize, bool isDataDynamic)
+void Apex::ElementBuffer::setData(const unsigned int* data, unsigned int dataSize, bool isDataDynamic)
 {
+    m_DataSize = dataSize;
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, dataSize, data, isDataDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 }

@@ -17,6 +17,7 @@ FetchContent_MakeAvailable(glfw)
 add_executable(ApexEngine
     engine/core/application.cpp
     engine/core/elementbuffer.cpp
+    engine/core/renderer.cpp
     engine/core/shader.cpp
     engine/core/texture.cpp
     engine/core/vertexbuffer.cpp
