@@ -58,11 +58,6 @@ void Apex::Window::setShouldWindowClose(bool value)
     glfwSetWindowShouldClose(m_WindowInstance, value);
 }
 
-bool Apex::Window::isKeyPressed(int key) const
-{
-    return glfwGetKey(m_WindowInstance, key) == GLFW_PRESS;
-}
-
 void Apex::Window::swapBuffers()
 {
     glfwSwapBuffers(m_WindowInstance);

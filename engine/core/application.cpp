@@ -1,6 +1,7 @@
 #include "application.h"
 
 #include "demoscene.h"
+#include "input.h"
 
 Apex::Application::Application()
 {
@@ -8,20 +9,15 @@ Apex::Application::Application()
     m_CurrentScene = std::make_unique<DemoScene>();
 }
 
-void processInput(Apex::Window& window)
-{
-    if (window.isKeyPressed(GLFW_KEY_ESCAPE))
-    {
-        window.setShouldWindowClose(true);
-    }
-}
-
 void Apex::Application::run()
 {
     while (!m_WindowInstance->getShouldWindowClose())
     {
-        // Input: escape closes window
-        processInput(*m_WindowInstance);
+        // Close the window on escape
+        if (Apex::Input::isKeyPressed(*m_WindowInstance, Apex::Key::Escape))
+        {
+            m_WindowInstance->setShouldWindowClose(true);
+        }
 
         m_CurrentScene->onRender();
 

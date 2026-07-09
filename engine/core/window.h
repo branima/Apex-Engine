@@ -12,11 +12,10 @@ namespace Apex
             Window(int width, int height, const char* title);
             ~Window();
 
+            GLFWwindow* getWindowInstance() const {return m_WindowInstance;}
+
             bool getShouldWindowClose() const;
             void setShouldWindowClose(bool value);
-
-            // Input
-            bool isKeyPressed(int key) const;
 
             // Rendering
             void swapBuffers();
