@@ -1,12 +1,15 @@
 #include "application.h"
 
-#include "demoscene.h"
 #include "input.h"
+
+#include "asteroidsScene.h"
+//#include "demoscene.h"
 
 Apex::Application::Application()
 {
-    m_WindowInstance = std::make_unique<Apex::Window>(800, 600, "Apex Engine");
-    m_CurrentScene = std::make_unique<DemoScene>();
+    m_WindowInstance = std::make_unique<Apex::Window>(1200, 800, "Apex Engine");
+    //m_CurrentScene = std::make_unique<DemoScene>();
+    m_CurrentScene = std::make_unique<AsteroidsScene>();
 }
 
 void Apex::Application::run()

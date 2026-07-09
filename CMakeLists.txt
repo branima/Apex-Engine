@@ -26,6 +26,7 @@ add_executable(ApexEngine
     engine/core/vertexarray.cpp
     engine/core/window.cpp
     external/glad/src/glad.c
+    game/asteroidsScene.cpp
     game/demoscene.cpp
     src/main.cpp
     src/stb_image.cpp
