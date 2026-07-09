@@ -20,6 +20,7 @@ add_executable(ApexEngine
     engine/core/renderer.cpp
     engine/core/shader.cpp
     engine/core/texture.cpp
+    engine/core/time.cpp
     engine/core/vertexbuffer.cpp
     engine/core/vertexarray.cpp
     engine/core/window.cpp

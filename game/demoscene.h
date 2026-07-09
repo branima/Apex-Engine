@@ -20,6 +20,7 @@ class DemoScene : public Apex::Scene
         void shapeRender();
 
     private:
+
         Apex::VertexBuffer m_VtxBuffer;
         Apex::ElementBuffer m_ElBuffer;
         Apex::VertexArray m_VtxArray;

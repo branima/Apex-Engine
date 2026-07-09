@@ -1,10 +1,10 @@
 #include "shader.h"
 
-#include <glm/gtc/type_ptr.hpp>
+#include <glad/glad.h>
 
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 Apex::Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
@@ -106,12 +106,12 @@ void Apex::Shader::setFloat(const std::string &name, float value) const
     glUniform1f(glGetUniformLocation(m_ID, name.c_str()), value);
 }
 
-void Apex::Shader::setMat4(const std::string &name, const glm::mat4& matrix) const
+void Apex::Shader::setMat4(const std::string &name, const Math::Mat4& matrix) const
 {
     glUniformMatrix4fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void Apex::Shader::checkCompileErrors(GLuint shader, std::string type)
+void Apex::Shader::checkCompileErrors(unsigned int shader, std::string type)
 {
     GLint success;
     GLchar infoLog[1024];

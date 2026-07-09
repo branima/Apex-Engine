@@ -1,13 +1,7 @@
 #include "demoscene.h"
 
-#include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <iostream>
-#include <cmath>
+#include "math.h"
+#include "time.h"
 
 DemoScene::DemoScene()
 {
@@ -71,14 +65,17 @@ void DemoScene::shapeRender()
     m_Texture1.bindToTextureUnit(0);
     m_Texture2.bindToTextureUnit(1);
 
-    m_Renderer.DrawElements(m_Shader, m_VtxArray, m_ElBuffer);
+    m_Shader.use();
+
+    m_Renderer.drawElements(m_VtxArray, m_ElBuffer);
 }
 
 void DemoScene::onRender()
 {
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+    Apex::Math::Mat4 trans = Apex::Math::getIdentity();
+    trans = Apex::Math::translate(trans, Apex::Math::Vec3(0.5f, -0.5f, 0.0f));
+    trans = Apex::Math::rotate(trans, Apex::Time::getTime(), Apex::Math::getK());
+
     m_Shader.setMat4("transform", trans);
 
     shapeRender();

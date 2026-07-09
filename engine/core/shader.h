@@ -1,9 +1,8 @@
 #pragma once
 
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-
 #include <string>
+
+#include "math.h"
 
 namespace Apex
 {
@@ -27,10 +26,10 @@ namespace Apex
         void setBool(const std::string &name, bool value) const;
         void setInt(const std::string &name, int value) const;
         void setFloat(const std::string &name, float value) const;
-        void setMat4(const std::string &name, const glm::mat4& matrix) const;
+        void setMat4(const std::string &name, const Math::Mat4& matrix) const;
 
     private:
-        void checkCompileErrors(GLuint shader, std::string type);
+        void checkCompileErrors(unsigned int shader, std::string type);
 
         unsigned int m_ID{0};
     };
