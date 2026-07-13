@@ -9,12 +9,17 @@ namespace Apex
     class Renderer
     {
         public:
-            Renderer() = default;
-            ~Renderer() = default;
+            static void initialize();
 
-            void clearWindowWithColor(Math::Vec4 color);
-            void clearWindow();
+            static void clearWindowWithColor(const Math::Vec4& color);
+            static void clearWindow();
 
-            void drawElements(VertexArray& vtxArray, const ElementBuffer& elBuffer);
+            static void drawElements(VertexArray& vtxArray, const ElementBuffer& elBuffer);
+
+            static void updateOrtographicProjMatrix(unsigned int width, unsigned int height);
+            static const Math::Mat4& getOrtographicProjMatrix();
+
+        private:
+            static Math::Mat4 ms_OrtogonalProjMatrix;
     };
 }

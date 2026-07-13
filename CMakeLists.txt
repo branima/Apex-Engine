@@ -21,12 +21,14 @@ add_executable(ApexEngine
     engine/core/renderer.cpp
     engine/core/shader.cpp
     engine/core/texture.cpp
+    engine/core/transform.cpp
     engine/core/time.cpp
     engine/core/vertexbuffer.cpp
     engine/core/vertexarray.cpp
     engine/core/window.cpp
     external/glad/src/glad.c
-    game/asteroidsScene.cpp
+    game/asteroids/asteroidsScene.cpp
+    game/asteroids/ship.cpp
     game/demoscene.cpp
     src/main.cpp
     src/stb_image.cpp
@@ -38,6 +40,7 @@ target_include_directories(ApexEngine PRIVATE
     external/glad/include
     external/glm
     game
+    game/asteroids
 )
 
 target_link_libraries(ApexEngine PRIVATE

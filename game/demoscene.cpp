@@ -1,6 +1,7 @@
 #include "demoscene.h"
 
 #include "math.h"
+#include "renderer.h"
 #include "time.h"
 
 DemoScene::DemoScene()
@@ -60,14 +61,14 @@ void DemoScene::shapeSetup()
 
 void DemoScene::shapeRender()
 {
-    m_Renderer.clearWindowWithColor(Apex::Math::Vec4(0.1f, 0.2f, 0.3f, 1.0f));
+    Apex::Renderer::clearWindowWithColor(Apex::Math::Vec4(0.1f, 0.2f, 0.3f, 1.0f));
 
     m_Texture1.bindToTextureUnit(0);
     m_Texture2.bindToTextureUnit(1);
 
     m_Shader.use();
 
-    m_Renderer.drawElements(m_VtxArray, m_ElBuffer);
+    Apex::Renderer::drawElements(m_VtxArray, m_ElBuffer);
 }
 
 void DemoScene::onRender()

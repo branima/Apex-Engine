@@ -6,6 +6,7 @@
 
 namespace Apex::Math
 {
+    using Vec2 = glm::vec2;
     using Vec3 = glm::vec3;
     using Vec4 = glm::vec4;
     using Mat4 = glm::mat4;
@@ -23,5 +24,10 @@ namespace Apex::Math
     inline Mat4 rotate(const Mat4& matrix, float radians, const Vec3& axis)
     {
         return glm::rotate(matrix, radians, axis);
+    }
+
+    inline Mat4 scale(const Mat4& matrix, const Vec3& scale)
+    {
+        return glm::scale(matrix, scale);
     }
 }

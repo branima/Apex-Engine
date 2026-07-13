@@ -2,9 +2,12 @@
 
 #include <iostream>
 
+#include "renderer.h"
+
 static void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    Apex::Renderer::updateOrtographicProjMatrix(width, height);
 }
 
 Apex::Window::Window()
@@ -38,6 +41,7 @@ Apex::Window::Window(int width, int height, const char* title)
 
     // Set viewport
     glViewport(0, 0, width, height);
+    Apex::Renderer::updateOrtographicProjMatrix(width, height);
 
     glfwSetFramebufferSizeCallback(m_WindowInstance, framebufferSizeCallback);
 }
