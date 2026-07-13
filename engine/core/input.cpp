@@ -34,3 +34,10 @@
         break;
     }
 }
+
+/* static */ Apex::Math::Vec2 Apex::Input::getCursorPosition(const Window& window)
+{
+    double x, y;
+    glfwGetCursorPos(window.getWindowInstance(), &x, &y);
+    return Math::Vec2(static_cast<float>(x), static_cast<float>(y));
+}

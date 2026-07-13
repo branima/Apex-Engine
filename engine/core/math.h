@@ -30,4 +30,14 @@ namespace Apex::Math
     {
         return glm::scale(matrix, scale);
     }
+
+    inline Vec3 normalize(const Vec3& vec)
+    {
+        return glm::length(vec) > 0.0f ? glm::normalize(vec) : vec;
+    }
+
+    inline float eulerToRadian(float eulerValue)
+    {
+        return glm::radians(eulerValue);
+    }
 }

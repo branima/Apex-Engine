@@ -13,6 +13,8 @@ class DemoScene : public Apex::Scene
         DemoScene();
         ~DemoScene() = default;
 
+        void handleInputs(Apex::Window& window) override;
+        void update(){}
         void onRender() override;
 
         void shapeSetup();

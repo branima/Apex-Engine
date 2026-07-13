@@ -12,10 +12,16 @@ class Ship
 {
     public:
         Ship();
-        Ship(const Apex::Math::Vec3& position, const Apex::Math::Vec3& scale);
+        Ship(const Apex::Math::Vec3& position, const Apex::Math::Vec3& scale, float rotation, float movementSpeed);
         ~Ship() = default;
 
         void onRender();
+
+        void move(const Apex::Math::Vec3& direction);
+        void lookAt(const Apex::Math::Vec2& cursorPosition);
+
+        void setMovementSpeed(float value) {m_MovementSpeed = value;}
+        float getMovementSpeed() const {return m_MovementSpeed;}
 
     private:
         Apex::VertexBuffer m_VtxBuffer;
@@ -26,4 +32,6 @@ class Ship
         Apex::Shader m_Shader;
 
         Apex::Transform m_Transform;
+
+        float m_MovementSpeed{0};
 };

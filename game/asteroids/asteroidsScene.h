@@ -10,6 +10,8 @@ class AsteroidsScene : public Apex::Scene
         AsteroidsScene();
         ~AsteroidsScene() = default;
 
+        void handleInputs(Apex::Window& window) override;
+        void update();
         void onRender() override;
 
         static constexpr float SCENE_WIDTH = 1200.0f;
@@ -25,14 +27,9 @@ class AsteroidsScene : public Apex::Scene
             return SCENE_HEIGHT;
         }
 
-        Apex::Math::Vec2 getSceneCenter() const override
-        {
-            return {
-                SCENE_WIDTH * 0.5f,
-                SCENE_HEIGHT * 0.5f
-            };
-        }
-
     private:
         Ship m_Ship;
+
+        Apex::Math::Vec3 m_MovementDirection;
+        Apex::Math::Vec2 m_CursorPosition;
 };

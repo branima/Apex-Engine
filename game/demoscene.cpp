@@ -1,5 +1,6 @@
 #include "demoscene.h"
 
+#include "input.h"
 #include "math.h"
 #include "renderer.h"
 #include "time.h"
@@ -12,6 +13,15 @@ DemoScene::DemoScene()
 
     //Prepare shaders and vertex information before render loop
     shapeSetup();
+}
+
+void DemoScene::handleInputs(Apex::Window& window)
+{
+    // Close the window on escape
+    if (Apex::Input::isKeyPressed(window, Apex::Key::Escape))
+    {
+        window.setShouldWindowClose(true);
+    }
 }
 
 void DemoScene::shapeSetup()
