@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "input.h"
 #include "renderer.h"
 
 static void framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -44,6 +45,8 @@ Apex::Window::Window(int width, int height, const char* title)
     Apex::Renderer::updateOrtographicProjMatrix(width, height);
 
     glfwSetFramebufferSizeCallback(m_WindowInstance, framebufferSizeCallback);
+    glfwSetKeyCallback(m_WindowInstance, Input::keyCallback);
+    glfwSetMouseButtonCallback(m_WindowInstance, Input::mouseButtonCallback);
 }
 
 Apex::Window::~Window()

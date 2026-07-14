@@ -12,26 +12,26 @@ AsteroidsScene::AsteroidsScene()
 void AsteroidsScene::handleInputs(Apex::Window& window)
 {
     Apex::Math::Vec3 direction(0.0f);
-    if (Apex::Input::isKeyPressed(window, Apex::Key::W))
+    if (Apex::Input::isKeyHeld(Apex::Key::W))
     {
         direction.y -= 1.0f;
     }
-    if (Apex::Input::isKeyPressed(window, Apex::Key::A))
+    if (Apex::Input::isKeyHeld(Apex::Key::A))
     {
         direction.x -= 1.0f;
     }
-    if (Apex::Input::isKeyPressed(window, Apex::Key::S))
+    if (Apex::Input::isKeyHeld(Apex::Key::S))
     {
         direction.y += 1.0f;
     }
-    if (Apex::Input::isKeyPressed(window, Apex::Key::D))
+    if (Apex::Input::isKeyHeld(Apex::Key::D))
     {
         direction.x += 1.0f;
     }
 
     m_MovementDirection = direction;
 
-    if (Apex::Input::isKeyPressed(window, Apex::Key::Escape))
+    if (Apex::Input::isKeyPressed(Apex::Key::Escape))
     {
         window.setShouldWindowClose(true);
     }

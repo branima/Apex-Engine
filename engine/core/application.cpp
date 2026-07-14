@@ -1,5 +1,6 @@
 #include "application.h"
 
+#include "input.h"
 #include "renderer.h"
 
 #include "asteroidsScene.h"
@@ -19,8 +20,8 @@ void Apex::Application::run()
 {
     while (!m_WindowInstance->getShouldWindowClose())
     {
-        m_WindowInstance->pollEvents();
         Time::update();
+        m_WindowInstance->pollEvents();
 
         m_CurrentScene->handleInputs(*m_WindowInstance);
 
@@ -28,5 +29,6 @@ void Apex::Application::run()
         m_CurrentScene->onRender();
 
         m_WindowInstance->swapBuffers();
+        Input::endFrame();
     }
 }

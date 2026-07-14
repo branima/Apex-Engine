@@ -18,7 +18,7 @@ DemoScene::DemoScene()
 void DemoScene::handleInputs(Apex::Window& window)
 {
     // Close the window on escape
-    if (Apex::Input::isKeyPressed(window, Apex::Key::Escape))
+    if (Apex::Input::isKeyPressed(Apex::Key::Escape))
     {
         window.setShouldWindowClose(true);
     }
