@@ -61,7 +61,7 @@ Apex::Texture& Apex::Texture::operator=(Texture&& other) noexcept
     return *this;
 }
 
-void Apex::Texture::bindToTextureUnit(unsigned int unit)
+void Apex::Texture::bindToTextureUnit(unsigned int unit) const
 {
     glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(GL_TEXTURE_2D, m_ID);

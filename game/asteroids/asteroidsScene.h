@@ -3,6 +3,8 @@
 #include <memory>
 
 #include "scene.h"
+#include "spriterenderer.h"
+#include "utils.h"
 
 #include "asteroid.h"
 #include "ship.h"
@@ -34,6 +36,13 @@ class AsteroidsScene : public Apex::Scene
         }
 
     private:
+        std::shared_ptr<Apex::Texture> m_ShipTexture = std::make_shared<Apex::Texture>("resources/textures/ship.png");
+        std::shared_ptr<Apex::Texture> m_ProjectileTexture = std::make_shared<Apex::Texture>("resources/textures/missile.png");
+        std::shared_ptr<Apex::Texture> m_AsteroidTexture1 = std::make_shared<Apex::Texture>("resources/textures/asteroid 1.png");
+        std::shared_ptr<Apex::Texture> m_AsteroidTexture2 = std::make_shared<Apex::Texture>("resources/textures/asteroid 2.png");
+
+        Apex::SpriteRenderer m_SpriteRenderer;
+
         // Ship
         Ship m_Ship;
         Apex::Math::Vec3 m_MovementDirection;

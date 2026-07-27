@@ -1,38 +1,28 @@
 #pragma once
 
-#include "elementbuffer.h"
 #include "math.h"
-#include "shader.h"
 #include "texture.h"
 #include "transform.h"
-#include "vertexarray.h"
-#include "vertexbuffer.h"
+
+#include <memory>
 
 class Projectile
 {
     public:
-    Projectile();
-    Projectile(const Apex::Math::Vec3& position, const Apex::Math::Vec3& scale, float rotation, float movementSpeed);
-    ~Projectile() = default;
+        Projectile(const Apex::Math::Vec3& position, const Apex::Math::Vec3& scale, float rotation, float movementSpeed, const std::shared_ptr<Apex::Texture>& texture);
+        ~Projectile() = default;
 
-    void onRender();
+        void move();
 
-    void move();
+        void setMovementSpeed(float value) {m_MovementSpeed = value;}
+        float getMovementSpeed() const {return m_MovementSpeed;}
 
-    void setMovementSpeed(float value) {m_MovementSpeed = value;}
-    float getMovementSpeed() const {return m_MovementSpeed;}
+        const Apex::Transform& getTransform() const {return m_Transform;}
+        const Apex::Texture& getTexture() const {return *m_Texture;}
 
-    const Apex::Transform& getTransform() const {return m_Transform;}
-
-private:
-    Apex::VertexBuffer m_VtxBuffer;
-    Apex::ElementBuffer m_ElBuffer;
-    Apex::VertexArray m_VtxArray;
-
-    Apex::Texture m_Texture;
-    Apex::Shader m_Shader;
-
-    Apex::Transform m_Transform;
+    private:
+        Apex::Transform m_Transform;
+        std::shared_ptr<Apex::Texture> m_Texture;
 
     float m_MovementSpeed{0};
 };

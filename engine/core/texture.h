@@ -17,7 +17,7 @@ namespace Apex
 
             unsigned int getID() const {return m_ID;}
 
-            void bindToTextureUnit(unsigned int unit);
+            void bindToTextureUnit(unsigned int unit) const;
 
         private:
             unsigned int m_ID{0};

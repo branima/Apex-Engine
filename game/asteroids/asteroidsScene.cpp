@@ -7,7 +7,7 @@
 #include <iostream>
 
 AsteroidsScene::AsteroidsScene()
-    : m_Ship(Apex::Math::Vec3(getSceneCenter().x, getSceneCenter().y, 1.0f), Apex::Math::Vec3(100.0f, 100.0f, 1.0f), 0.0f, 500.0f),
+    : m_Ship(Apex::Math::Vec3(getSceneCenter().x, getSceneCenter().y, 1.0f), Apex::Math::Vec3(100.0f, 100.0f, 1.0f), 0.0f, 500.0f, m_ShipTexture),
       m_MovementDirection(0.0f)
 {
 }
@@ -43,7 +43,7 @@ void AsteroidsScene::handleInputs(Apex::Window& window)
         // We want to spawn projectiles from the tip of the ship, not from the middle of the sprite, hence the offset
         const Apex::Math::Vec3 projectileSpawnPosition = shipTransform.getPosition() + shipTransform.getForward() * shipScale.y / 2.0f;
 
-        m_Projectiles.push_back(std::make_unique<Projectile>(projectileSpawnPosition, shipScale / 5.0f, shipTransform.getRotation(), m_Ship.getMovementSpeed() * 2.0f));
+        m_Projectiles.push_back(std::make_unique<Projectile>(projectileSpawnPosition, shipScale / 5.0f, shipTransform.getRotation(), m_Ship.getMovementSpeed() * 2.0f, m_ProjectileTexture));
     }
 
     m_CursorPosition = Apex::Input::getCursorPosition(window);
@@ -97,16 +97,16 @@ void AsteroidsScene::onRender()
 {
     Apex::Renderer::clearWindowWithColor(Apex::Math::Vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
-    m_Ship.onRender();
+    m_SpriteRenderer.render(m_Ship.getTransform(), m_Ship.getTexture());
 
     for (const auto& projectile : m_Projectiles)
     {
-        projectile->onRender();
+        m_SpriteRenderer.render(projectile->getTransform(), projectile->getTexture());
     }
 
     for (const auto& asteroid : m_Asteroids)
     {
-        asteroid->onRender();
+        m_SpriteRenderer.render(asteroid->getTransform(), asteroid->getTexture());
     }
 }
 
@@ -140,5 +140,5 @@ void AsteroidsScene::spawnAsteroid()
     const float k = std::min(distanceToHorizontalEdge, distanceToVerticalEdge);
     const Apex::Math::Vec3 position(x + directionToEdge.x * k, y + directionToEdge.y * k, 0.0f);
 
-    m_Asteroids.push_back(std::make_unique<Asteroid>(position, scale, rotation, movementSpeed));
+    m_Asteroids.push_back(std::make_unique<Asteroid>(position, scale, rotation, movementSpeed, Apex::Utils::getRandomInt(0, 1) ? m_AsteroidTexture1 : m_AsteroidTexture2));
 }

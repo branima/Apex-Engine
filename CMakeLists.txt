@@ -21,6 +21,7 @@ add_executable(ApexEngine
     engine/core/renderer.cpp
     engine/core/scene.cpp
     engine/core/shader.cpp
+    engine/core/spriterenderer.cpp
     engine/core/texture.cpp
     engine/core/transform.cpp
     engine/core/time.cpp
