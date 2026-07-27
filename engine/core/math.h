@@ -6,6 +6,8 @@
 
 namespace Apex::Math
 {
+    static constexpr float EPSILON = 0.0001f;
+
     using Vec2 = glm::vec2;
     using Vec3 = glm::vec3;
     using Vec4 = glm::vec4;
@@ -33,7 +35,7 @@ namespace Apex::Math
 
     inline Vec3 normalize(const Vec3& vec)
     {
-        return glm::length(vec) > 0.0f ? glm::normalize(vec) : vec;
+        return glm::length(vec) > Math::EPSILON ? glm::normalize(vec) : Vec3(0.0f);
     }
 
     inline float eulerToRadian(float eulerValue)

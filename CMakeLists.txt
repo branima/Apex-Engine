@@ -24,10 +24,12 @@ add_executable(ApexEngine
     engine/core/texture.cpp
     engine/core/transform.cpp
     engine/core/time.cpp
+    engine/core/utils.cpp
     engine/core/vertexbuffer.cpp
     engine/core/vertexarray.cpp
     engine/core/window.cpp
     external/glad/src/glad.c
+    game/asteroids/asteroid.cpp
     game/asteroids/asteroidsScene.cpp
     game/asteroids/projectile.cpp
     game/asteroids/ship.cpp
