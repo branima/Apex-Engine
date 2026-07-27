@@ -8,25 +8,20 @@
     {
     case Key::W:
         return GLFW_KEY_W;
-        break;
     case Key::A:
         return GLFW_KEY_A;
-        break;
     case Key::S:
         return GLFW_KEY_S;
-        break;
     case Key::D:
         return GLFW_KEY_D;
-        break;
     case Key::Space:
         return GLFW_KEY_SPACE;
-        break;
     case Key::Escape:
         return GLFW_KEY_ESCAPE;
-        break;
+    case Key::MouseLeftClick:
+        return GLFW_MOUSE_BUTTON_1;
     default:
         return GLFW_KEY_UNKNOWN;
-        break;
     }
 }
 

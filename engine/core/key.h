@@ -9,6 +9,7 @@ namespace Apex
         S,
         D,
         Space,
-        Escape
+        Escape,
+        MouseLeftClick
     };
 }

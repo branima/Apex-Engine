@@ -23,6 +23,8 @@ class Ship
         void setMovementSpeed(float value) {m_MovementSpeed = value;}
         float getMovementSpeed() const {return m_MovementSpeed;}
 
+        const Apex::Transform& getTransform() const {return m_Transform;}
+
     private:
         Apex::VertexBuffer m_VtxBuffer;
         Apex::ElementBuffer m_ElBuffer;

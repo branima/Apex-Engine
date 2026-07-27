@@ -15,6 +15,12 @@ Apex::Transform::Transform(const Math::Vec3& position, const Math::Vec3& scale, 
 {
 }
 
+const Apex::Math::Vec3 Apex::Transform::getForward() const
+{
+    const float rotationAngle = m_Rotation - Apex::Math::eulerToRadian(90.0f);
+    return {std::cos(rotationAngle), std::sin(rotationAngle), 0.0f};
+}
+
 Apex::Math::Mat4 Apex::Transform::getMatrix() const
 {
   Apex::Math::Mat4 trans = Apex::Math::getIdentity();

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 
 project(ApexEngine)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 include(FetchContent)
 
@@ -19,6 +19,7 @@ add_executable(ApexEngine
     engine/core/elementbuffer.cpp
     engine/core/input.cpp
     engine/core/renderer.cpp
+    engine/core/scene.cpp
     engine/core/shader.cpp
     engine/core/texture.cpp
     engine/core/transform.cpp
@@ -28,6 +29,7 @@ add_executable(ApexEngine
     engine/core/window.cpp
     external/glad/src/glad.c
     game/asteroids/asteroidsScene.cpp
+    game/asteroids/projectile.cpp
     game/asteroids/ship.cpp
     game/demoscene.cpp
     src/main.cpp

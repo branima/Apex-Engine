@@ -20,6 +20,8 @@ namespace Apex
             void setRotation(float value) {m_Rotation = value;}
             float getRotation() const {return m_Rotation;}
 
+            const Math::Vec3 getForward() const;
+
             Math::Mat4 getMatrix() const;
 
         private:

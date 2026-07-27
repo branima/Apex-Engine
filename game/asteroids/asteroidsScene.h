@@ -1,8 +1,11 @@
 #pragma once
 
+#include <memory>
+
 #include "scene.h"
 
 #include "ship.h"
+#include "projectile.h"
 
 class AsteroidsScene : public Apex::Scene
 {
@@ -29,6 +32,7 @@ class AsteroidsScene : public Apex::Scene
 
     private:
         Ship m_Ship;
+        std::vector<std::unique_ptr<Projectile>> m_Projectiles;
 
         Apex::Math::Vec3 m_MovementDirection;
         Apex::Math::Vec2 m_CursorPosition;
