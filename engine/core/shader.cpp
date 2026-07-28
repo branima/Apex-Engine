@@ -111,6 +111,11 @@ void Apex::Shader::setMat4(const std::string &name, const Math::Mat4& matrix) co
     glUniformMatrix4fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
+void Apex::Shader::setVec4(const std::string &name, const Math::Vec4& value) const
+{
+    glUniform4fv(glGetUniformLocation(m_ID, name.c_str()), 1, glm::value_ptr(value));
+}
+
 void Apex::Shader::checkCompileErrors(unsigned int shader, std::string type)
 {
     GLint success;

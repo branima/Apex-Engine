@@ -1,5 +1,6 @@
 #include "asteroidsScene.h"
 
+#include "collisionhelper.h"
 #include "input.h"
 #include "renderer.h"
 #include "utils.h"
@@ -91,22 +92,80 @@ void AsteroidsScene::update()
         return isObjectOutOfScene(asteroid->getTransform());
     });
 
+    //Collisions
+    Apex::CircleCollider& shipCollider = m_Ship.getCollider();
+    const Apex::Transform& shipTransform = m_Ship.getTransform();
+    bool hasShipCollided = false;
+
+    for (auto& asteroid : m_Asteroids)
+    {
+        Apex::CircleCollider& asteroidCollider = asteroid->getCollider();
+        asteroidCollider.setIsCurrentlyInCollision(false);
+
+        const Apex::Transform& asteroidTransform = asteroid->getTransform();
+
+        if (Apex::CollisionHelper::checkCollision(shipCollider, shipTransform, asteroidCollider, asteroidTransform))
+        {
+            hasShipCollided = true;
+            asteroidCollider.setIsCurrentlyInCollision(true);
+        }
+
+        for (auto& projectile : m_Projectiles)
+        {
+            Apex::CircleCollider& projectileCollider = projectile->getCollider();
+            const Apex::Transform& projectileTransform = projectile->getTransform();
+            if (Apex::CollisionHelper::checkCollision(asteroidCollider, asteroidTransform, projectileCollider, projectileTransform))
+            {
+                asteroidCollider.setIsCurrentlyInCollision(true);
+                projectileCollider.setIsCurrentlyInCollision(true);
+                m_ObjectsForDestruction.insert(asteroid.get());
+                m_ObjectsForDestruction.insert(projectile.get());
+                break;
+            }
+        }
+    }
+
+    shipCollider.setIsCurrentlyInCollision(hasShipCollided);
+
+    // Destroy asteroids and projectiles that have participated in a collision
+    std::erase_if(m_Asteroids,
+    [this](const std::unique_ptr<Asteroid>& asteroid)
+    {
+        return  m_ObjectsForDestruction.contains(asteroid.get());
+    });
+
+    std::erase_if(m_Projectiles,
+    [this](const std::unique_ptr<Projectile>& projectile)
+    {
+        return  m_ObjectsForDestruction.contains(projectile.get());
+    });
+
+    m_ObjectsForDestruction.clear();
 }
 
 void AsteroidsScene::onRender()
 {
     Apex::Renderer::clearWindowWithColor(Apex::Math::Vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
-    m_SpriteRenderer.render(m_Ship.getTransform(), m_Ship.getTexture());
+    const Apex::Transform& shipTransform = m_Ship.getTransform();
+    const Apex::CircleCollider& shipCollider = m_Ship.getCollider();
+    const Apex::Math::Vec4& colliderColor = shipCollider.getIsCurrentlyInCollision() ? Apex::DebugRenderer::COLLIDER_COLOR_COLLIDED : Apex::DebugRenderer::COLLIDER_COLOR_NORMAL;
+    m_SpriteRenderer.render(shipTransform, m_Ship.getTexture());
+    m_DebugRenderer.drawCircle(shipTransform.getPosition(), m_Ship.getCollider().getRadius(), colliderColor);
 
     for (const auto& projectile : m_Projectiles)
     {
         m_SpriteRenderer.render(projectile->getTransform(), projectile->getTexture());
+        m_DebugRenderer.drawCircle(projectile->getTransform().getPosition(), projectile->getCollider().getRadius());
     }
 
     for (const auto& asteroid : m_Asteroids)
     {
+        const Apex::Transform& asteroidTransform = asteroid->getTransform();
+        const Apex::CircleCollider& asteroidCollider = asteroid->getCollider();
+        const Apex::Math::Vec4& astColliderColor = asteroidCollider.getIsCurrentlyInCollision() ? Apex::DebugRenderer::COLLIDER_COLOR_COLLIDED : Apex::DebugRenderer::COLLIDER_COLOR_NORMAL;
         m_SpriteRenderer.render(asteroid->getTransform(), asteroid->getTexture());
+        m_DebugRenderer.drawCircle(asteroid->getTransform().getPosition(), asteroid->getCollider().getRadius(), astColliderColor);
     }
 }
 
@@ -140,5 +199,5 @@ void AsteroidsScene::spawnAsteroid()
     const float k = std::min(distanceToHorizontalEdge, distanceToVerticalEdge);
     const Apex::Math::Vec3 position(x + directionToEdge.x * k, y + directionToEdge.y * k, 0.0f);
 
-    m_Asteroids.push_back(std::make_unique<Asteroid>(position, scale, rotation, movementSpeed, Apex::Utils::getRandomInt(0, 1) ? m_AsteroidTexture1 : m_AsteroidTexture2));
+    m_Asteroids.push_back(std::make_unique<Asteroid>(position, scale, rotation, movementSpeed, m_AsteroidTextures[Apex::Utils::getRandomInt(0, m_AsteroidTextures.size() - 1)]));
 }

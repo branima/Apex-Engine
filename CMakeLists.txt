@@ -17,6 +17,9 @@ FetchContent_MakeAvailable(glfw)
 add_executable(ApexEngine
     engine/core/application.cpp
     engine/core/elementbuffer.cpp
+    engine/core/circlecollider.cpp
+    engine/core/collisionhelper.cpp
+    engine/core/debugrenderer.cpp
     engine/core/input.cpp
     engine/core/renderer.cpp
     engine/core/scene.cpp

@@ -9,6 +9,8 @@ Projectile::Projectile(const Apex::Math::Vec3& position, const Apex::Math::Vec3&
     m_Transform.setRotation(rotation);
     m_MovementSpeed = movementSpeed;
 
+    m_Collider.setRadius(scale.x / 2.0f);
+
     m_Texture = texture;
 }
 

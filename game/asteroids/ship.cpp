@@ -9,6 +9,8 @@ Ship::Ship(const Apex::Math::Vec3& position, const Apex::Math::Vec3& scale, floa
     m_Transform.setRotation(rotation);
     m_MovementSpeed = movementSpeed;
 
+    m_Collider.setRadius(scale.x / 2.0f);
+
     m_Texture = texture;
 }
 

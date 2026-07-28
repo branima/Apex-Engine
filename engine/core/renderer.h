@@ -15,6 +15,7 @@ namespace Apex
             static void clearWindow();
 
             static void drawElements(VertexArray& vtxArray, const ElementBuffer& elBuffer);
+            static void drawLineLoop(VertexArray& vtxArray, unsigned int vertexCount);
 
             static void updateOrtographicProjMatrix(unsigned int width, unsigned int height);
             static const Math::Mat4& getOrtographicProjMatrix();

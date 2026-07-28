@@ -7,6 +7,7 @@
 namespace Apex::Math
 {
     static constexpr float EPSILON = 0.0001f;
+    static constexpr float TWO_PI = M_PI * 2.0f;
 
     using Vec2 = glm::vec2;
     using Vec3 = glm::vec3;
@@ -36,6 +37,11 @@ namespace Apex::Math
     inline Vec3 normalize(const Vec3& vec)
     {
         return glm::length(vec) > Math::EPSILON ? glm::normalize(vec) : Vec3(0.0f);
+    }
+
+    inline float dotProduct(const Vec3& vecA, const Vec3& vecB)
+    {
+        return glm::dot(vecA, vecB);
     }
 
     inline float eulerToRadian(float eulerValue)

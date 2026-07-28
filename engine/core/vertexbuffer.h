@@ -18,7 +18,7 @@ namespace Apex
 
             void bind();
             void unbind();
-            void setData(const float* data, int dataSize, bool isDataDynamic = false);
+            void setData(const void* data, int dataSize, bool isDataDynamic = false);
 
         private:
             unsigned int m_ID{0};

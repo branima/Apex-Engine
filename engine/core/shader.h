@@ -27,6 +27,7 @@ namespace Apex
         void setInt(const std::string &name, int value) const;
         void setFloat(const std::string &name, float value) const;
         void setMat4(const std::string &name, const Math::Mat4& matrix) const;
+        void setVec4(const std::string &name, const Math::Vec4& value) const;
 
     private:
         void checkCompileErrors(unsigned int shader, std::string type);

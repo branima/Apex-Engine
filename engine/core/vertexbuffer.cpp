@@ -41,7 +41,7 @@ void Apex::VertexBuffer::unbind()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Apex::VertexBuffer::setData(const float* data, int dataSize, bool isDataDynamic)
+void Apex::VertexBuffer::setData(const void* data, int dataSize, bool isDataDynamic)
 {
     glBufferData(GL_ARRAY_BUFFER, dataSize, data, isDataDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 }

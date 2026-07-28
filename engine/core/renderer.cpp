@@ -32,6 +32,12 @@ namespace Apex
     glDrawElements(GL_TRIANGLES, elBuffer.getDataCount(), GL_UNSIGNED_INT, 0);
 }
 
+/* static */ void Apex::Renderer::drawLineLoop(VertexArray& vtxArray, unsigned int vertexCount)
+{
+    vtxArray.bind();
+    glDrawArrays(GL_LINE_LOOP, 0, vertexCount);
+}
+
 /* static */ void Apex::Renderer::updateOrtographicProjMatrix(unsigned int width, unsigned int height)
 {
     ms_OrtogonalProjMatrix = glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
