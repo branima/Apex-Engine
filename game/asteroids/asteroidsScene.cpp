@@ -127,6 +127,14 @@ void AsteroidsScene::update()
 
     shipCollider.setIsCurrentlyInCollision(hasShipCollided);
 
+    for (auto& asteroid : m_Asteroids)
+    {
+        if(m_ObjectsForDestruction.contains(asteroid.get()))
+        {
+            asteroidSplit(*asteroid);
+        }
+    }
+
     // Destroy asteroids and projectiles that have participated in a collision
     std::erase_if(m_Asteroids,
     [this](const std::unique_ptr<Asteroid>& asteroid)
@@ -150,12 +158,12 @@ void AsteroidsScene::onRender()
     const Apex::Transform& shipTransform = m_Ship.getTransform();
     const Apex::CircleCollider& shipCollider = m_Ship.getCollider();
     const Apex::Math::Vec4& colliderColor = shipCollider.getIsCurrentlyInCollision() ? Apex::DebugRenderer::COLLIDER_COLOR_COLLIDED : Apex::DebugRenderer::COLLIDER_COLOR_NORMAL;
-    m_SpriteRenderer.render(shipTransform, m_Ship.getTexture());
+    m_SpriteRenderer.render(shipTransform, *m_Ship.getTexture());
     m_DebugRenderer.drawCircle(shipTransform.getPosition(), m_Ship.getCollider().getRadius(), colliderColor);
 
     for (const auto& projectile : m_Projectiles)
     {
-        m_SpriteRenderer.render(projectile->getTransform(), projectile->getTexture());
+        m_SpriteRenderer.render(projectile->getTransform(), *projectile->getTexture());
         m_DebugRenderer.drawCircle(projectile->getTransform().getPosition(), projectile->getCollider().getRadius());
     }
 
@@ -164,8 +172,30 @@ void AsteroidsScene::onRender()
         const Apex::Transform& asteroidTransform = asteroid->getTransform();
         const Apex::CircleCollider& asteroidCollider = asteroid->getCollider();
         const Apex::Math::Vec4& astColliderColor = asteroidCollider.getIsCurrentlyInCollision() ? Apex::DebugRenderer::COLLIDER_COLOR_COLLIDED : Apex::DebugRenderer::COLLIDER_COLOR_NORMAL;
-        m_SpriteRenderer.render(asteroid->getTransform(), asteroid->getTexture());
+        m_SpriteRenderer.render(asteroid->getTransform(), *asteroid->getTexture());
         m_DebugRenderer.drawCircle(asteroid->getTransform().getPosition(), asteroid->getCollider().getRadius(), astColliderColor);
+    }
+}
+
+void AsteroidsScene::asteroidSplit(const Asteroid& asteroid)
+{
+    const AsteroidCategory category = asteroid.getCategory();
+    if (category != AsteroidCategory::Invalid && category != AsteroidCategory::Small)
+    {
+        const int newAsteroidCount = Apex::Utils::getRandomInt(2, 5);
+
+        const Apex::Transform& ogAsteroidTransform = asteroid.getTransform();
+        const Apex::Math::Vec3& spawnPosition = ogAsteroidTransform.getPosition();
+        const Apex::Math::Vec3& scale = ogAsteroidTransform.getScale() / static_cast<float>(newAsteroidCount);
+        const float initialRotation = ogAsteroidTransform.getRotation();
+        const float movementSpeed = asteroid.getMovementSpeed();
+        const std::shared_ptr<Apex::Texture>& texture = asteroid.getTexture();
+
+        for (int i = 0; i < newAsteroidCount; ++i)
+        {
+            const float rotation = initialRotation + Apex::Math::eulerToRadian(i * 360.0f / newAsteroidCount + Apex::Utils::getRandomFloat(-30.0f, 30.0f));
+            spawnAsteroid(spawnPosition, scale, rotation, movementSpeed * (1.0f + Apex::Utils::getRandomFloat(0.5f, 1.5f)), texture);
+        }
     }
 }
 
@@ -199,5 +229,11 @@ void AsteroidsScene::spawnAsteroid()
     const float k = std::min(distanceToHorizontalEdge, distanceToVerticalEdge);
     const Apex::Math::Vec3 position(x + directionToEdge.x * k, y + directionToEdge.y * k, 0.0f);
 
-    m_Asteroids.push_back(std::make_unique<Asteroid>(position, scale, rotation, movementSpeed, m_AsteroidTextures[Apex::Utils::getRandomInt(0, m_AsteroidTextures.size() - 1)]));
+    spawnAsteroid(position, scale, rotation, movementSpeed, m_AsteroidTextures[Apex::Utils::getRandomInt(0, m_AsteroidTextures.size() - 1)]);
+}
+
+void AsteroidsScene::spawnAsteroid(const Apex::Math::Vec3& position, const Apex::Math::Vec3& scale, float rotation,
+            float movementSpeed, const std::shared_ptr<Apex::Texture>& texture)
+{
+    m_Asteroids.push_back(std::make_unique<Asteroid>(position, scale, rotation, movementSpeed, texture));
 }

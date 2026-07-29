@@ -22,8 +22,6 @@ class AsteroidsScene : public Apex::Scene
         void update() override;
         void onRender() override;
 
-        void spawnAsteroid();
-
         static constexpr float SCENE_WIDTH = 1200.0f;
         static constexpr float SCENE_HEIGHT = 800.0f;
 
@@ -38,6 +36,11 @@ class AsteroidsScene : public Apex::Scene
         }
 
     private:
+        void asteroidSplit(const Asteroid& asteroid);
+        void spawnAsteroid();
+        void spawnAsteroid(const Apex::Math::Vec3& position, const Apex::Math::Vec3& scale, float rotation,
+            float movementSpeed, const std::shared_ptr<Apex::Texture>& texture);
+
         std::shared_ptr<Apex::Texture> m_ShipTexture = std::make_shared<Apex::Texture>("resources/textures/ship.png");
         std::shared_ptr<Apex::Texture> m_ProjectileTexture = std::make_shared<Apex::Texture>("resources/textures/missile.png");
         std::array<std::shared_ptr<Apex::Texture>, 2> m_AsteroidTextures {std::make_shared<Apex::Texture>("resources/textures/asteroid 1.png"), std::make_shared<Apex::Texture>("resources/textures/asteroid 2.png")};

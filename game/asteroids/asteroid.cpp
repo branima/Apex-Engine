@@ -15,6 +15,19 @@ Asteroid::Asteroid(const Apex::Math::Vec3& position, const Apex::Math::Vec3& sca
     m_Collider.setRadius(scale.x / 2.0f);
 
     m_Texture = texture;
+
+    if (scale.x < 100.0f)
+    {
+        m_Category = AsteroidCategory::Small;
+    }
+    else if (scale.x < 300.0f)
+    {
+        m_Category = AsteroidCategory::Medium;
+    }
+    else
+    {
+        m_Category = AsteroidCategory::Big;
+    }
 }
 
 void Asteroid::move()

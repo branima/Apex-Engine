@@ -1,9 +1,12 @@
 #pragma once
 
+#include "asteroidcategory.h"
+
 #include "circlecollider.h"
 #include "math.h"
 #include "texture.h"
 #include "transform.h"
+
 
 #include <memory>
 
@@ -20,12 +23,16 @@ class Asteroid
 
         const Apex::Transform& getTransform() const {return m_Transform;}
         Apex::CircleCollider& getCollider() {return m_Collider;}
-        const Apex::Texture& getTexture() const {return *m_Texture;}
+        const std::shared_ptr<Apex::Texture>& getTexture() const {return m_Texture;}
+
+        AsteroidCategory getCategory() const {return m_Category;}
 
     private:
         Apex::Transform m_Transform;
         Apex::CircleCollider m_Collider;
         std::shared_ptr<Apex::Texture> m_Texture;
 
-    float m_MovementSpeed{0};
+        AsteroidCategory m_Category{AsteroidCategory::Invalid};
+
+        float m_MovementSpeed{0};
 };

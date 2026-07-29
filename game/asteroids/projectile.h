@@ -20,7 +20,7 @@ class Projectile
 
         const Apex::Transform& getTransform() const {return m_Transform;}
         Apex::CircleCollider& getCollider() {return m_Collider;}
-        const Apex::Texture& getTexture() const {return *m_Texture;}
+        const std::shared_ptr<Apex::Texture>& getTexture() const {return m_Texture;}
 
     private:
         Apex::Transform m_Transform;
