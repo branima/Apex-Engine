@@ -16,6 +16,7 @@ namespace Apex
         ~SpriteRenderer() = default;
 
         void render(const Transform& transform, const Texture& texture);
+        void renderAcrossScene(float width, float height, const Texture& texture);
 
     private:
         VertexBuffer m_VtxBuffer;

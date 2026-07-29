@@ -55,3 +55,17 @@ void Apex::SpriteRenderer::render(const Transform& transform, const Texture& tex
 
     Apex::Renderer::drawElements(m_VtxArray, m_ElBuffer);
 }
+
+void Apex::SpriteRenderer::renderAcrossScene(float width, float height, const Texture& texture)
+{
+    texture.bindToTextureUnit(0);
+    m_Shader.use();
+
+    Apex::Math::Mat4 transMatrix = Apex::Math::getIdentity();
+    transMatrix = Apex::Math::translate(transMatrix, Apex::Math::Vec3(width / 2.0f, height / 2.0f, 0.0f));
+    transMatrix = Apex::Math::scale(transMatrix, Apex::Math::Vec3(width, height, 1.0f));
+    m_Shader.setMat4("transform", transMatrix);
+    m_Shader.setMat4("projection", Apex::Renderer::getOrtographicProjMatrix());
+
+    Apex::Renderer::drawElements(m_VtxArray, m_ElBuffer);
+}

@@ -20,8 +20,12 @@ class Ship
         float getMovementSpeed() const {return m_MovementSpeed;}
 
         const Apex::Transform& getTransform() const {return m_Transform;}
+        Apex::Transform& getTransform() {return m_Transform;}
+
         Apex::CircleCollider& getCollider() {return m_Collider;}
+
         const std::shared_ptr<Apex::Texture>& getTexture() const {return m_Texture;}
+        void setTexture(const std::shared_ptr<Apex::Texture>& value) {m_Texture = value;}
 
     private:
         Apex::Transform m_Transform;

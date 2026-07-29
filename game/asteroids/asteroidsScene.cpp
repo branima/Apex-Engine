@@ -9,12 +9,27 @@
 
 AsteroidsScene::AsteroidsScene()
     : m_Ship(Apex::Math::Vec3(getSceneCenter().x, getSceneCenter().y, 1.0f), Apex::Math::Vec3(100.0f, 100.0f, 1.0f), 0.0f, 500.0f, m_ShipTexture),
-      m_MovementDirection(0.0f)
+      m_MovementDirection(0.0f),
+      m_State(GameState::Running)
 {
 }
 
 void AsteroidsScene::handleInputs(Apex::Window& window)
 {
+    if (Apex::Input::isKeyPressed(Apex::Key::Escape))
+    {
+        window.setShouldWindowClose(true);
+    }
+
+    if (m_State == GameState::Over)
+    {
+        if (Apex::Input::isKeyPressed(Apex::Key::Space))
+        {
+            reset();
+        }
+        return;
+    }
+
     // Movement
     Apex::Math::Vec3 direction(0.0f);
     if (Apex::Input::isKeyHeld(Apex::Key::W))
@@ -48,15 +63,38 @@ void AsteroidsScene::handleInputs(Apex::Window& window)
     }
 
     m_CursorPosition = Apex::Input::getCursorPosition(window);
+}
 
-    if (Apex::Input::isKeyPressed(Apex::Key::Escape))
-    {
-        window.setShouldWindowClose(true);
-    }
+void AsteroidsScene::reset()
+{
+    Apex::Transform& shipTransform = m_Ship.getTransform();
+    shipTransform.setPosition({getSceneCenter().x, getSceneCenter().y, 1.0f});
+    shipTransform.setScale({100.0f, 100.0f, 1.0f});
+    shipTransform.setRotation(0.0f);
+
+    m_Ship.setMovementSpeed(500.0f);
+    m_Ship.setTexture(m_ShipTexture);
+
+    m_Projectiles.clear();
+    m_Asteroids.clear();
+    m_ObjectsForDestruction.clear();
+
+    m_MovementDirection = Apex::Math::Vec3(0.0f);
+    m_LastAsteroidSpawnTime = -1000.0f;
+
+    m_State = GameState::Running;
+
+    m_Lives = 3;
+    m_LastShipHitTime = -1000.0f;
 }
 
 void AsteroidsScene::update()
 {
+    if (m_State != GameState::Running)
+    {
+        return;
+    }
+
     // Ship
     m_Ship.move(m_MovementDirection);
     m_Ship.lookAt(m_CursorPosition);
@@ -104,10 +142,16 @@ void AsteroidsScene::update()
 
         const Apex::Transform& asteroidTransform = asteroid->getTransform();
 
-        if (Apex::CollisionHelper::checkCollision(shipCollider, shipTransform, asteroidCollider, asteroidTransform))
+        if (Apex::Time::getTime() - m_LastShipHitTime >= m_ShipInvincibilityTime && Apex::CollisionHelper::checkCollision(shipCollider, shipTransform, asteroidCollider, asteroidTransform))
         {
             hasShipCollided = true;
             asteroidCollider.setIsCurrentlyInCollision(true);
+            if (--m_Lives == 0)
+            {
+                m_State = GameState::Over;
+            }
+
+            m_LastShipHitTime = Apex::Time::getTime();
         }
 
         for (auto& projectile : m_Projectiles)
@@ -155,11 +199,16 @@ void AsteroidsScene::onRender()
 {
     Apex::Renderer::clearWindowWithColor(Apex::Math::Vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
-    const Apex::Transform& shipTransform = m_Ship.getTransform();
-    const Apex::CircleCollider& shipCollider = m_Ship.getCollider();
-    const Apex::Math::Vec4& colliderColor = shipCollider.getIsCurrentlyInCollision() ? Apex::DebugRenderer::COLLIDER_COLOR_COLLIDED : Apex::DebugRenderer::COLLIDER_COLOR_NORMAL;
-    m_SpriteRenderer.render(shipTransform, *m_Ship.getTexture());
-    m_DebugRenderer.drawCircle(shipTransform.getPosition(), m_Ship.getCollider().getRadius(), colliderColor);
+    const bool shouldRenderShip = (Apex::Time::getTime() - m_LastShipHitTime >= m_ShipInvincibilityTime) || static_cast<int>(Apex::Time::getTime() / 0.15f) % 2 == 0;
+
+    if (shouldRenderShip)
+    {
+        const Apex::Transform& shipTransform = m_Ship.getTransform();
+        const Apex::CircleCollider& shipCollider = m_Ship.getCollider();
+        const Apex::Math::Vec4& colliderColor = shipCollider.getIsCurrentlyInCollision() ? Apex::DebugRenderer::COLLIDER_COLOR_COLLIDED : Apex::DebugRenderer::COLLIDER_COLOR_NORMAL;
+        m_SpriteRenderer.render(shipTransform, *m_Ship.getTexture());
+        m_DebugRenderer.drawCircle(shipTransform.getPosition(), m_Ship.getCollider().getRadius(), colliderColor);
+    }
 
     for (const auto& projectile : m_Projectiles)
     {
@@ -174,6 +223,22 @@ void AsteroidsScene::onRender()
         const Apex::Math::Vec4& astColliderColor = asteroidCollider.getIsCurrentlyInCollision() ? Apex::DebugRenderer::COLLIDER_COLOR_COLLIDED : Apex::DebugRenderer::COLLIDER_COLOR_NORMAL;
         m_SpriteRenderer.render(asteroid->getTransform(), *asteroid->getTexture());
         m_DebugRenderer.drawCircle(asteroid->getTransform().getPosition(), asteroid->getCollider().getRadius(), astColliderColor);
+    }
+
+    Apex::Transform lifeTransform = m_Ship.getTransform();
+    lifeTransform.setScale(lifeTransform.getScale() * 0.5f);
+    lifeTransform.setRotation(0.0f);
+
+    for (int i = 0; i < m_Lives; ++i)
+    {
+        const float scaleHalf = lifeTransform.getScale().x * 0.5f;
+        lifeTransform.setPosition({scaleHalf + i * scaleHalf * 2.5f, scaleHalf, 0.0f});
+        m_SpriteRenderer.render(lifeTransform, *m_Ship.getTexture());
+    }
+
+    if (m_State == GameState::Over)
+    {
+        m_SpriteRenderer.renderAcrossScene(getWidth(), getHeight(), *m_GameOverTexture);
     }
 }
 
@@ -207,7 +272,7 @@ void AsteroidsScene::spawnAsteroid()
     // Rotation
     const float rotation = Apex::Math::eulerToRadian(Apex::Utils::getRandomFloat(0.0f, 360.0f));
     // Movement speed
-    const float movementSpeed = Apex::Utils::getRandomFloat(50.0f, 150.0f);
+    const float movementSpeed = Apex::Utils::getRandomFloat(200.0f, 400.0f) * 100.0f / scaleFactor;
 
     // Spawn Position
     const float x = Apex::Utils::getRandomFloat(0.0f, SCENE_WIDTH);

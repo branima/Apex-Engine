@@ -14,6 +14,7 @@ namespace Apex
             virtual void handleInputs(Window& window) = 0;
             virtual void update() = 0;
             virtual void onRender() = 0;
+            virtual void reset() = 0;
 
             bool isObjectOutOfScene(const Transform& transform) const;
 
