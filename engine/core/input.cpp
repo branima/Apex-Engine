@@ -2,7 +2,7 @@
 
 #include <GLFW/glfw3.h>
 
-/* static */ unsigned int Apex::Input::getGLFWKey(Key key)
+/* static */ int Apex::Input::getGLFWKey(Key key)
 {
     switch (key)
     {
@@ -16,6 +16,8 @@
         return GLFW_KEY_D;
     case Key::Space:
         return GLFW_KEY_SPACE;
+    case Key::C:
+        return GLFW_KEY_C;
     case Key::Escape:
         return GLFW_KEY_ESCAPE;
     case Key::MouseLeftClick:

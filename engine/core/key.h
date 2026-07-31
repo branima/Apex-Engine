@@ -8,6 +8,7 @@ namespace Apex
         A,
         S,
         D,
+        C,
         Space,
         Escape,
         MouseLeftClick

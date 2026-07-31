@@ -16,13 +16,8 @@ namespace Apex
             void setRadius(float value) {m_Radius = value;}
             float getRadius() const {return m_Radius;}
 
-            void setIsCurrentlyInCollision(bool value) {m_IsCurrentlyInCollision = value;}
-            bool getIsCurrentlyInCollision() const {return m_IsCurrentlyInCollision;}
-
         private:
             Math::Vec3 m_Offset{0.0f};
             float m_Radius{0.0f};
-
-            bool m_IsCurrentlyInCollision{false};
     };
 }

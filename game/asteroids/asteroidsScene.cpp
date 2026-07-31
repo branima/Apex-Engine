@@ -30,6 +30,11 @@ void AsteroidsScene::handleInputs(Apex::Window& window)
         return;
     }
 
+    if (Apex::Input::isKeyPressed(Apex::Key::C))
+    {
+        m_IsDebugActive = !m_IsDebugActive;
+    }
+
     // Movement
     Apex::Math::Vec3 direction(0.0f);
     if (Apex::Input::isKeyHeld(Apex::Key::W))
@@ -54,12 +59,7 @@ void AsteroidsScene::handleInputs(Apex::Window& window)
     // Shooting
     if (Apex::Input::isMouseButtonPressed(Apex::Key::MouseLeftClick))
     {
-        const Apex::Transform& shipTransform = m_Ship.getTransform();
-        const Apex::Math::Vec3& shipScale = shipTransform.getScale();
-        // We want to spawn projectiles from the tip of the ship, not from the middle of the sprite, hence the offset
-        const Apex::Math::Vec3 projectileSpawnPosition = shipTransform.getPosition() + shipTransform.getForward() * shipScale.y / 2.0f;
-
-        m_Projectiles.push_back(std::make_unique<Projectile>(projectileSpawnPosition, shipScale / 5.0f, shipTransform.getRotation(), m_Ship.getMovementSpeed() * 2.0f, m_ProjectileTexture));
+        spawnProjectile();
     }
 
     m_CursorPosition = Apex::Input::getCursorPosition(window);
@@ -73,19 +73,17 @@ void AsteroidsScene::reset()
     shipTransform.setRotation(0.0f);
 
     m_Ship.setMovementSpeed(500.0f);
-    m_Ship.setTexture(m_ShipTexture);
 
     m_Projectiles.clear();
     m_Asteroids.clear();
-    m_ObjectsForDestruction.clear();
 
     m_MovementDirection = Apex::Math::Vec3(0.0f);
     m_LastAsteroidSpawnTime = -1000.0f;
 
-    m_State = GameState::Running;
-
     m_Lives = 3;
     m_LastShipHitTime = -1000.0f;
+
+    m_State = GameState::Running;
 }
 
 void AsteroidsScene::update()
@@ -95,136 +93,59 @@ void AsteroidsScene::update()
         return;
     }
 
-    // Ship
-    m_Ship.move(m_MovementDirection);
-    m_Ship.lookAt(m_CursorPosition);
+    objectMove();
+    checkOutOfScreenObjects();
+    processCollisions();
 
-    // Projectiles
-    for (auto& projectile : m_Projectiles)
-    {
-        projectile->move();
-    }
-
-    std::erase_if(m_Projectiles,
-    [this](const std::unique_ptr<Projectile>& projectile)
-    {
-        return isObjectOutOfScene(projectile->getTransform());
-    });
-
-    // Asteroids
-    const float currentTime = Apex::Time::getTime();
-    if (currentTime - m_LastAsteroidSpawnTime >= 1.0f / m_AsteroidSpawnRate)
-    {
-        spawnAsteroid();
-        m_LastAsteroidSpawnTime = currentTime;
-    }
-
-    for (auto& asteroid : m_Asteroids)
-    {
-        asteroid->move();
-    }
-
-    std::erase_if(m_Asteroids,
-    [this](const std::unique_ptr<Asteroid>& asteroid)
-    {
-        return isObjectOutOfScene(asteroid->getTransform());
-    });
-
-    //Collisions
-    Apex::CircleCollider& shipCollider = m_Ship.getCollider();
-    const Apex::Transform& shipTransform = m_Ship.getTransform();
-    bool hasShipCollided = false;
-
-    for (auto& asteroid : m_Asteroids)
-    {
-        Apex::CircleCollider& asteroidCollider = asteroid->getCollider();
-        asteroidCollider.setIsCurrentlyInCollision(false);
-
-        const Apex::Transform& asteroidTransform = asteroid->getTransform();
-
-        if (Apex::Time::getTime() - m_LastShipHitTime >= m_ShipInvincibilityTime && Apex::CollisionHelper::checkCollision(shipCollider, shipTransform, asteroidCollider, asteroidTransform))
-        {
-            hasShipCollided = true;
-            asteroidCollider.setIsCurrentlyInCollision(true);
-            if (--m_Lives == 0)
-            {
-                m_State = GameState::Over;
-            }
-
-            m_LastShipHitTime = Apex::Time::getTime();
-        }
-
-        for (auto& projectile : m_Projectiles)
-        {
-            Apex::CircleCollider& projectileCollider = projectile->getCollider();
-            const Apex::Transform& projectileTransform = projectile->getTransform();
-            if (Apex::CollisionHelper::checkCollision(asteroidCollider, asteroidTransform, projectileCollider, projectileTransform))
-            {
-                asteroidCollider.setIsCurrentlyInCollision(true);
-                projectileCollider.setIsCurrentlyInCollision(true);
-                m_ObjectsForDestruction.insert(asteroid.get());
-                m_ObjectsForDestruction.insert(projectile.get());
-                break;
-            }
-        }
-    }
-
-    shipCollider.setIsCurrentlyInCollision(hasShipCollided);
-
-    for (auto& asteroid : m_Asteroids)
-    {
-        if(m_ObjectsForDestruction.contains(asteroid.get()))
-        {
-            asteroidSplit(*asteroid);
-        }
-    }
-
-    // Destroy asteroids and projectiles that have participated in a collision
-    std::erase_if(m_Asteroids,
-    [this](const std::unique_ptr<Asteroid>& asteroid)
-    {
-        return  m_ObjectsForDestruction.contains(asteroid.get());
-    });
-
-    std::erase_if(m_Projectiles,
-    [this](const std::unique_ptr<Projectile>& projectile)
-    {
-        return  m_ObjectsForDestruction.contains(projectile.get());
-    });
-
-    m_ObjectsForDestruction.clear();
+    spawnAsteroids();
+    removeObjectsQueuedForDestruction();
 }
 
 void AsteroidsScene::onRender()
 {
     Apex::Renderer::clearWindowWithColor(Apex::Math::Vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
+    /// Ship
     const bool shouldRenderShip = (Apex::Time::getTime() - m_LastShipHitTime >= m_ShipInvincibilityTime) || static_cast<int>(Apex::Time::getTime() / 0.15f) % 2 == 0;
-
     if (shouldRenderShip)
     {
         const Apex::Transform& shipTransform = m_Ship.getTransform();
         const Apex::CircleCollider& shipCollider = m_Ship.getCollider();
-        const Apex::Math::Vec4& colliderColor = shipCollider.getIsCurrentlyInCollision() ? Apex::DebugRenderer::COLLIDER_COLOR_COLLIDED : Apex::DebugRenderer::COLLIDER_COLOR_NORMAL;
         m_SpriteRenderer.render(shipTransform, *m_Ship.getTexture());
-        m_DebugRenderer.drawCircle(shipTransform.getPosition(), m_Ship.getCollider().getRadius(), colliderColor);
+
+        if (m_IsDebugActive)
+        {
+            m_DebugRenderer.drawCircle(shipTransform.getPosition(), shipCollider.getRadius());
+        }
     }
 
+    /// Projectiles
     for (const auto& projectile : m_Projectiles)
     {
-        m_SpriteRenderer.render(projectile->getTransform(), *projectile->getTexture());
-        m_DebugRenderer.drawCircle(projectile->getTransform().getPosition(), projectile->getCollider().getRadius());
+        const Apex::Transform& projectileTransform = projectile->getTransform();
+        const Apex::CircleCollider& projectileCollider = projectile->getCollider();
+        m_SpriteRenderer.render(projectileTransform, *projectile->getTexture());
+
+        if (m_IsDebugActive)
+        {
+            m_DebugRenderer.drawCircle(projectileTransform.getPosition(), projectileCollider.getRadius());
+        }
     }
 
+    /// Asteroids
     for (const auto& asteroid : m_Asteroids)
     {
         const Apex::Transform& asteroidTransform = asteroid->getTransform();
         const Apex::CircleCollider& asteroidCollider = asteroid->getCollider();
-        const Apex::Math::Vec4& astColliderColor = asteroidCollider.getIsCurrentlyInCollision() ? Apex::DebugRenderer::COLLIDER_COLOR_COLLIDED : Apex::DebugRenderer::COLLIDER_COLOR_NORMAL;
         m_SpriteRenderer.render(asteroid->getTransform(), *asteroid->getTexture());
-        m_DebugRenderer.drawCircle(asteroid->getTransform().getPosition(), asteroid->getCollider().getRadius(), astColliderColor);
+
+        if (m_IsDebugActive)
+        {
+            m_DebugRenderer.drawCircle(asteroid->getTransform().getPosition(), asteroidCollider.getRadius());
+        }
     }
 
+    /// Lives in top left corner
     Apex::Transform lifeTransform = m_Ship.getTransform();
     lifeTransform.setScale(lifeTransform.getScale() * 0.5f);
     lifeTransform.setRotation(0.0f);
@@ -236,9 +157,129 @@ void AsteroidsScene::onRender()
         m_SpriteRenderer.render(lifeTransform, *m_Ship.getTexture());
     }
 
+    /// Game Over screen
     if (m_State == GameState::Over)
     {
         m_SpriteRenderer.renderAcrossScene(getWidth(), getHeight(), *m_GameOverTexture);
+    }
+}
+
+void AsteroidsScene::objectMove()
+{
+    // Ship
+    m_Ship.move(m_MovementDirection);
+    m_Ship.lookAt(m_CursorPosition);
+
+    // Projectiles
+    for (auto& projectile : m_Projectiles)
+    {
+        projectile->move();
+    }
+
+    // Asteroids
+    for (auto& asteroid : m_Asteroids)
+    {
+        asteroid->move();
+    }
+}
+
+void AsteroidsScene::checkOutOfScreenObjects()
+{
+    // Projectiles
+    for (auto& projectile : m_Projectiles)
+    {
+        if (isObjectOutOfScene(projectile->getTransform()))
+        {
+            projectile->setIsMarkedForDestruction(true);
+        }
+    }
+
+    // Asteroids
+    for (auto& asteroid : m_Asteroids)
+    {
+        if (isObjectOutOfScene(asteroid->getTransform()))
+        {
+            asteroid->setIsMarkedForDestruction(true);
+        }
+    }
+}
+
+void AsteroidsScene::removeObjectsQueuedForDestruction()
+{
+    std::erase_if(m_Asteroids,
+    [this](const std::unique_ptr<Asteroid>& asteroid)
+    {
+        return  asteroid->getIsMarkedForDestruction();
+    });
+
+    std::erase_if(m_Projectiles,
+    [this](const std::unique_ptr<Projectile>& projectile)
+    {
+        return  projectile->getIsMarkedForDestruction();
+    });
+}
+
+void AsteroidsScene::spawnAsteroids()
+{
+    const float currentTime = Apex::Time::getTime();
+    if (currentTime - m_LastAsteroidSpawnTime >= 1.0f / m_AsteroidSpawnRate)
+    {
+        spawnAsteroid();
+        m_LastAsteroidSpawnTime = currentTime;
+    }
+}
+
+void AsteroidsScene::processCollisions()
+{
+    Apex::CircleCollider& shipCollider = m_Ship.getCollider();
+    const Apex::Transform& shipTransform = m_Ship.getTransform();
+
+    for (auto& asteroid : m_Asteroids)
+    {
+        Apex::CircleCollider& asteroidCollider = asteroid->getCollider();
+        const Apex::Transform& asteroidTransform = asteroid->getTransform();
+
+        if (Apex::Time::getTime() - m_LastShipHitTime >= m_ShipInvincibilityTime && Apex::CollisionHelper::checkCollision(shipCollider, shipTransform, asteroidCollider, asteroidTransform))
+        {
+            if (--m_Lives == 0)
+            {
+                m_State = GameState::Over;
+            }
+
+            m_LastShipHitTime = Apex::Time::getTime();
+        }
+
+        for (auto& projectile : m_Projectiles)
+        {
+            if (projectile->getIsMarkedForDestruction())
+            {
+                continue;
+            }
+
+            Apex::CircleCollider& projectileCollider = projectile->getCollider();
+            const Apex::Transform& projectileTransform = projectile->getTransform();
+
+            if (Apex::CollisionHelper::checkCollision(asteroidCollider, asteroidTransform, projectileCollider, projectileTransform))
+            {
+                asteroid->setIsMarkedForDestruction(true);
+                projectile->setIsMarkedForDestruction(true);
+                break;
+            }
+        }
+    }
+
+    for (auto& asteroid : m_Asteroids)
+    {
+        if(asteroid->getIsMarkedForDestruction())
+        {
+            asteroidSplit(*asteroid);
+        }
+    }
+
+    if (m_AsteroidSplitSpawns.size() > 0)
+    {
+        std::ranges::move(m_AsteroidSplitSpawns, std::back_inserter(m_Asteroids));
+        m_AsteroidSplitSpawns.clear();
     }
 }
 
@@ -259,7 +300,7 @@ void AsteroidsScene::asteroidSplit(const Asteroid& asteroid)
         for (int i = 0; i < newAsteroidCount; ++i)
         {
             const float rotation = initialRotation + Apex::Math::eulerToRadian(i * 360.0f / newAsteroidCount + Apex::Utils::getRandomFloat(-30.0f, 30.0f));
-            spawnAsteroid(spawnPosition, scale, rotation, movementSpeed * (1.0f + Apex::Utils::getRandomFloat(0.5f, 1.5f)), texture);
+            m_AsteroidSplitSpawns.push_back(std::make_unique<Asteroid>(spawnPosition, scale, rotation, movementSpeed * (1.0f + Apex::Utils::getRandomFloat(0.5f, 1.5f)), texture));
         }
     }
 }
@@ -294,11 +335,15 @@ void AsteroidsScene::spawnAsteroid()
     const float k = std::min(distanceToHorizontalEdge, distanceToVerticalEdge);
     const Apex::Math::Vec3 position(x + directionToEdge.x * k, y + directionToEdge.y * k, 0.0f);
 
-    spawnAsteroid(position, scale, rotation, movementSpeed, m_AsteroidTextures[Apex::Utils::getRandomInt(0, m_AsteroidTextures.size() - 1)]);
+    m_Asteroids.push_back(std::make_unique<Asteroid>(position, scale, rotation, movementSpeed, m_AsteroidTextures[Apex::Utils::getRandomInt(0, m_AsteroidTextures.size() - 1)]));
 }
 
-void AsteroidsScene::spawnAsteroid(const Apex::Math::Vec3& position, const Apex::Math::Vec3& scale, float rotation,
-            float movementSpeed, const std::shared_ptr<Apex::Texture>& texture)
+void AsteroidsScene::spawnProjectile()
 {
-    m_Asteroids.push_back(std::make_unique<Asteroid>(position, scale, rotation, movementSpeed, texture));
+    const Apex::Transform& shipTransform = m_Ship.getTransform();
+    const Apex::Math::Vec3& shipScale = shipTransform.getScale();
+    // We want to spawn projectiles from the tip of the ship, not from the middle of the sprite, hence the offset
+    const Apex::Math::Vec3 projectileSpawnPosition = shipTransform.getPosition() + shipTransform.getForward() * shipScale.y / 2.0f;
+
+    m_Projectiles.push_back(std::make_unique<Projectile>(projectileSpawnPosition, shipScale / 5.0f, shipTransform.getRotation(), m_Ship.getMovementSpeed() * 2.0f, m_ProjectileTexture));
 }

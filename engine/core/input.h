@@ -9,7 +9,7 @@ namespace Apex
     class Input
     {
         public:
-            static unsigned int getGLFWKey(Key key);
+            static int getGLFWKey(Key key);
 
             static bool isKeyHeld(Key key);
             static bool isKeyPressed(Key key);
@@ -17,7 +17,7 @@ namespace Apex
 
             static bool isMouseButtonHeld(Key button);
             static bool isMouseButtonPressed(Key button);
-            static bool isMouseButtonReleased(Key button);\
+            static bool isMouseButtonReleased(Key button);
 
             static Math::Vec2 getCursorPosition(const Window& window);
 

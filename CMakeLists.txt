@@ -35,6 +35,7 @@ add_executable(ApexEngine
     external/glad/src/glad.c
     game/asteroids/asteroid.cpp
     game/asteroids/asteroidsScene.cpp
+    game/asteroids/gameobject.cpp
     game/asteroids/projectile.cpp
     game/asteroids/ship.cpp
     game/demoscene.cpp

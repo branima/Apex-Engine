@@ -16,8 +16,8 @@ namespace Apex
 
             unsigned int getID() const {return m_ID;}
 
-            void bind();
-            void unbind();
+            void bind() const;
+            void unbind() const;
 
             void setVertexAttribute(unsigned int location, unsigned int size, unsigned int stride, unsigned long long offset);
 

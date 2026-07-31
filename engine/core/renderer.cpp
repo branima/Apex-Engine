@@ -26,13 +26,13 @@ namespace Apex
     clearWindowWithColor(Math::Vec4(0.0));
 }
 
-/* static */ void Apex::Renderer::drawElements(VertexArray& vtxArray, const ElementBuffer& elBuffer)
+/* static */ void Apex::Renderer::drawElements(const VertexArray& vtxArray, const ElementBuffer& elBuffer)
 {
     vtxArray.bind();
     glDrawElements(GL_TRIANGLES, elBuffer.getDataCount(), GL_UNSIGNED_INT, 0);
 }
 
-/* static */ void Apex::Renderer::drawLineLoop(VertexArray& vtxArray, unsigned int vertexCount)
+/* static */ void Apex::Renderer::drawLineLoop(const VertexArray& vtxArray, unsigned int vertexCount)
 {
     vtxArray.bind();
     glDrawArrays(GL_LINE_LOOP, 0, vertexCount);

@@ -14,8 +14,8 @@ namespace Apex
             static void clearWindowWithColor(const Math::Vec4& color);
             static void clearWindow();
 
-            static void drawElements(VertexArray& vtxArray, const ElementBuffer& elBuffer);
-            static void drawLineLoop(VertexArray& vtxArray, unsigned int vertexCount);
+            static void drawElements(const VertexArray& vtxArray, const ElementBuffer& elBuffer);
+            static void drawLineLoop(const VertexArray& vtxArray, unsigned int vertexCount);
 
             static void updateOrtographicProjMatrix(unsigned int width, unsigned int height);
             static const Math::Mat4& getOrtographicProjMatrix();

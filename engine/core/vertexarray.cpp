@@ -31,12 +31,12 @@ Apex::VertexArray& Apex::VertexArray::operator=(VertexArray&& other) noexcept
     return *this;
 }
 
-void Apex::VertexArray::bind()
+void Apex::VertexArray::bind() const
 {
     glBindVertexArray(m_ID);
 }
 
-void Apex::VertexArray::unbind()
+void Apex::VertexArray::unbind() const
 {
     glBindVertexArray(0);
 }

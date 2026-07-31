@@ -15,10 +15,10 @@ namespace Apex
         DebugRenderer();
         ~DebugRenderer() = default;
 
-        void drawCircle(const Math::Vec3& center, float radius, const Math::Vec4& color = Math::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        void drawCircle(const Math::Vec3& center, float radius, const Math::Vec4& color = COLLIDER_COLOR_NORMAL);
 
     private:
-        const unsigned int CIRCLE_VERTEX_COUNT{32};
+        static constexpr unsigned int CIRCLE_VERTEX_COUNT{32};
         VertexArray m_CircleVertexArray;
         VertexBuffer m_CircleVertexBuffer;
         Shader m_LineShader;

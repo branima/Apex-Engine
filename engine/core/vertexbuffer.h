@@ -16,8 +16,8 @@ namespace Apex
 
             unsigned int getID() const {return m_ID;}
 
-            void bind();
-            void unbind();
+            void bind() const;
+            void unbind() const;
             void setData(const void* data, int dataSize, bool isDataDynamic = false);
 
         private:

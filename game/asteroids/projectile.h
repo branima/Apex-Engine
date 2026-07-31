@@ -1,31 +1,12 @@
 #pragma once
 
-#include "circlecollider.h"
-#include "math.h"
-#include "texture.h"
-#include "transform.h"
+#include "gameobject.h"
 
-#include <memory>
-
-class Projectile
+class Projectile : public GameObject
 {
     public:
         Projectile(const Apex::Math::Vec3& position, const Apex::Math::Vec3& scale, float rotation, float movementSpeed, const std::shared_ptr<Apex::Texture>& texture);
         ~Projectile() = default;
 
-        void move();
-
-        void setMovementSpeed(float value) {m_MovementSpeed = value;}
-        float getMovementSpeed() const {return m_MovementSpeed;}
-
-        const Apex::Transform& getTransform() const {return m_Transform;}
-        Apex::CircleCollider& getCollider() {return m_Collider;}
-        const std::shared_ptr<Apex::Texture>& getTexture() const {return m_Texture;}
-
-    private:
-        Apex::Transform m_Transform;
-        Apex::CircleCollider m_Collider;
-        std::shared_ptr<Apex::Texture> m_Texture;
-
-    float m_MovementSpeed{0};
+        void move() override;
 };

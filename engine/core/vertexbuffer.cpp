@@ -31,12 +31,12 @@ Apex::VertexBuffer& Apex::VertexBuffer::operator=(VertexBuffer&& other) noexcept
     return *this;
 }
 
-void Apex::VertexBuffer::bind()
+void Apex::VertexBuffer::bind() const
 {
     glBindBuffer(GL_ARRAY_BUFFER, m_ID);
 }
 
-void Apex::VertexBuffer::unbind()
+void Apex::VertexBuffer::unbind() const
 {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

@@ -38,10 +38,15 @@ class AsteroidsScene : public Apex::Scene
         }
 
     private:
-        void asteroidSplit(const Asteroid& asteroid);
+        void spawnProjectile();
         void spawnAsteroid();
-        void spawnAsteroid(const Apex::Math::Vec3& position, const Apex::Math::Vec3& scale, float rotation,
-            float movementSpeed, const std::shared_ptr<Apex::Texture>& texture);
+        void spawnAsteroids();
+        void asteroidSplit(const Asteroid& asteroid);
+        void checkOutOfScreenObjects();
+        void removeObjectsQueuedForDestruction();
+
+        void objectMove();
+        void processCollisions();
 
         std::shared_ptr<Apex::Texture> m_ShipTexture = std::make_shared<Apex::Texture>("resources/textures/ship.png");
         std::shared_ptr<Apex::Texture> m_ProjectileTexture = std::make_shared<Apex::Texture>("resources/textures/missile.png");
@@ -53,22 +58,22 @@ class AsteroidsScene : public Apex::Scene
         // Ship
         Ship m_Ship;
         Apex::Math::Vec3 m_MovementDirection;
+        Apex::Math::Vec2 m_CursorPosition;
+
+        unsigned int m_Lives{3};
+        float m_LastShipHitTime {-1000.0f};
+        float m_ShipInvincibilityTime {3.0f};
 
         // Projectiles
         std::vector<std::unique_ptr<Projectile>> m_Projectiles;
 
         // Asteroids
         std::vector<std::unique_ptr<Asteroid>> m_Asteroids;
+        std::vector<std::unique_ptr<Asteroid>> m_AsteroidSplitSpawns;
         float m_LastAsteroidSpawnTime {-1000.0f}; // Forcing immediate spawn on engine startup
         float m_AsteroidSpawnRate {0.5f}; // Asteroids per second.
 
-        std::unordered_set<void*> m_ObjectsForDestruction;
-
-        Apex::Math::Vec2 m_CursorPosition;
-
+        // General
         GameState m_State {GameState::Invalid};
-
-        unsigned int m_Lives{3};
-        float m_LastShipHitTime {-1000.0f};
-        float m_ShipInvincibilityTime {3.0f};
+        bool m_IsDebugActive {false};
 };

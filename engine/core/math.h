@@ -4,10 +4,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <numbers>
+
 namespace Apex::Math
 {
     static constexpr float EPSILON = 0.0001f;
-    static constexpr float TWO_PI = M_PI * 2.0f;
+    inline constexpr float PI = std::numbers::pi_v<float>;
+    inline constexpr float TWO_PI = PI * 2.0f;
 
     using Vec2 = glm::vec2;
     using Vec3 = glm::vec3;
