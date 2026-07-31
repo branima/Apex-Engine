@@ -8,7 +8,6 @@
 static void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
-    Apex::Renderer::updateOrtographicProjMatrix(width, height);
 }
 
 Apex::Window::Window()

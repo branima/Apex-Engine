@@ -5,13 +5,17 @@
 #include "renderer.h"
 #include "utils.h"
 
+#include <fstream>
 #include <iostream>
+
+#include <imgui.h>
 
 AsteroidsScene::AsteroidsScene()
     : m_Ship(Apex::Math::Vec3(getSceneCenter().x, getSceneCenter().y, 1.0f), Apex::Math::Vec3(100.0f, 100.0f, 1.0f), 0.0f, 500.0f, m_ShipTexture),
       m_MovementDirection(0.0f),
       m_State(GameState::Running)
 {
+    loadHighScore();
 }
 
 void AsteroidsScene::handleInputs(Apex::Window& window)
@@ -32,7 +36,12 @@ void AsteroidsScene::handleInputs(Apex::Window& window)
 
     if (Apex::Input::isKeyPressed(Apex::Key::C))
     {
-        m_IsDebugActive = !m_IsDebugActive;
+        m_IsGizmoEnabled = !m_IsGizmoEnabled;
+    }
+
+    if (Apex::Input::isKeyPressed(Apex::Key::TAB))
+    {
+        m_IsDebugWindowActive = !m_IsDebugWindowActive;
     }
 
     // Movement
@@ -62,7 +71,7 @@ void AsteroidsScene::handleInputs(Apex::Window& window)
         spawnProjectile();
     }
 
-    m_CursorPosition = Apex::Input::getCursorPosition(window);
+    m_CursorPosition = Apex::Input::getCursorPosition(window, SCENE_WIDTH, SCENE_HEIGHT);
 }
 
 void AsteroidsScene::reset()
@@ -78,12 +87,19 @@ void AsteroidsScene::reset()
     m_Asteroids.clear();
 
     m_MovementDirection = Apex::Math::Vec3(0.0f);
+
+    m_AsteroidSpawnRate = 0.5f;
     m_LastAsteroidSpawnTime = -1000.0f;
 
     m_Lives = 3;
     m_LastShipHitTime = -1000.0f;
 
+    m_Score = 0;
+
     m_State = GameState::Running;
+
+    m_LastGameSpeedUpTime = 0.0f;
+    m_SpeedUpPercentage = 0.0f;
 }
 
 void AsteroidsScene::update()
@@ -93,27 +109,33 @@ void AsteroidsScene::update()
         return;
     }
 
+    const float currentTime = Apex::Time::getTime();
+
     objectMove();
     checkOutOfScreenObjects();
-    processCollisions();
+    processCollisions(currentTime);
 
-    spawnAsteroids();
+    spawnAsteroids(currentTime);
     removeObjectsQueuedForDestruction();
+
+    progressionStep(currentTime);
 }
 
 void AsteroidsScene::onRender()
 {
     Apex::Renderer::clearWindowWithColor(Apex::Math::Vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
+    const float currentTime = Apex::Time::getTime();
+
     /// Ship
-    const bool shouldRenderShip = (Apex::Time::getTime() - m_LastShipHitTime >= m_ShipInvincibilityTime) || static_cast<int>(Apex::Time::getTime() / 0.15f) % 2 == 0;
+    const bool shouldRenderShip = (currentTime - m_LastShipHitTime >= m_ShipInvincibilityTime) || static_cast<int>(currentTime / 0.15f) % 2 == 0;
     if (shouldRenderShip)
     {
         const Apex::Transform& shipTransform = m_Ship.getTransform();
         const Apex::CircleCollider& shipCollider = m_Ship.getCollider();
         m_SpriteRenderer.render(shipTransform, *m_Ship.getTexture());
 
-        if (m_IsDebugActive)
+        if (m_IsGizmoEnabled)
         {
             m_DebugRenderer.drawCircle(shipTransform.getPosition(), shipCollider.getRadius());
         }
@@ -126,7 +148,7 @@ void AsteroidsScene::onRender()
         const Apex::CircleCollider& projectileCollider = projectile->getCollider();
         m_SpriteRenderer.render(projectileTransform, *projectile->getTexture());
 
-        if (m_IsDebugActive)
+        if (m_IsGizmoEnabled)
         {
             m_DebugRenderer.drawCircle(projectileTransform.getPosition(), projectileCollider.getRadius());
         }
@@ -139,7 +161,7 @@ void AsteroidsScene::onRender()
         const Apex::CircleCollider& asteroidCollider = asteroid->getCollider();
         m_SpriteRenderer.render(asteroid->getTransform(), *asteroid->getTexture());
 
-        if (m_IsDebugActive)
+        if (m_IsGizmoEnabled)
         {
             m_DebugRenderer.drawCircle(asteroid->getTransform().getPosition(), asteroidCollider.getRadius());
         }
@@ -219,9 +241,8 @@ void AsteroidsScene::removeObjectsQueuedForDestruction()
     });
 }
 
-void AsteroidsScene::spawnAsteroids()
+void AsteroidsScene::spawnAsteroids(float currentTime)
 {
-    const float currentTime = Apex::Time::getTime();
     if (currentTime - m_LastAsteroidSpawnTime >= 1.0f / m_AsteroidSpawnRate)
     {
         spawnAsteroid();
@@ -229,7 +250,7 @@ void AsteroidsScene::spawnAsteroids()
     }
 }
 
-void AsteroidsScene::processCollisions()
+void AsteroidsScene::processCollisions(float currentTime)
 {
     Apex::CircleCollider& shipCollider = m_Ship.getCollider();
     const Apex::Transform& shipTransform = m_Ship.getTransform();
@@ -239,14 +260,15 @@ void AsteroidsScene::processCollisions()
         Apex::CircleCollider& asteroidCollider = asteroid->getCollider();
         const Apex::Transform& asteroidTransform = asteroid->getTransform();
 
-        if (Apex::Time::getTime() - m_LastShipHitTime >= m_ShipInvincibilityTime && Apex::CollisionHelper::checkCollision(shipCollider, shipTransform, asteroidCollider, asteroidTransform))
+        if (currentTime - m_LastShipHitTime >= m_ShipInvincibilityTime && Apex::CollisionHelper::checkCollision(shipCollider, shipTransform, asteroidCollider, asteroidTransform))
         {
             if (--m_Lives == 0)
             {
                 m_State = GameState::Over;
+                saveHighScore();
             }
 
-            m_LastShipHitTime = Apex::Time::getTime();
+            m_LastShipHitTime = currentTime;
         }
 
         for (auto& projectile : m_Projectiles)
@@ -263,6 +285,7 @@ void AsteroidsScene::processCollisions()
             {
                 asteroid->setIsMarkedForDestruction(true);
                 projectile->setIsMarkedForDestruction(true);
+                m_Score += getScoreForCategory(asteroid->getCategory());
                 break;
             }
         }
@@ -346,4 +369,89 @@ void AsteroidsScene::spawnProjectile()
     const Apex::Math::Vec3 projectileSpawnPosition = shipTransform.getPosition() + shipTransform.getForward() * shipScale.y / 2.0f;
 
     m_Projectiles.push_back(std::make_unique<Projectile>(projectileSpawnPosition, shipScale / 5.0f, shipTransform.getRotation(), m_Ship.getMovementSpeed() * 2.0f, m_ProjectileTexture));
+}
+
+int AsteroidsScene::getScoreForCategory(AsteroidCategory category) const
+{
+    // Smaller asteroids are harder to hit, so they're worth more
+    switch (category)
+    {
+    case AsteroidCategory::Small:
+        return 100;
+    case AsteroidCategory::Medium:
+        return 50;
+    case AsteroidCategory::Big:
+        return 20;
+    default:
+        return 0;
+    }
+}
+
+void AsteroidsScene::progressionStep(float currentTime)
+{
+    if (currentTime - m_LastGameSpeedUpTime >= m_SpeedUpTimer)
+    {
+        m_SpeedUpPercentage += m_SpeedUpStep;
+        m_LastGameSpeedUpTime = currentTime;
+
+        m_AsteroidSpawnRate *= (1.0f + m_SpeedUpPercentage);
+        for (auto& asteroid : m_Asteroids)
+        {
+            asteroid->setMovementSpeed(asteroid->getMovementSpeed() * (1.0f + m_SpeedUpPercentage));
+        }
+    }
+}
+
+void AsteroidsScene::loadHighScore()
+{
+    std::ifstream file(HIGH_SCORE_FILE);
+    if (file.is_open())
+    {
+        file >> m_HighScore;
+    }
+}
+
+void AsteroidsScene::saveHighScore()
+{
+    if (m_Score <= m_HighScore)
+    {
+        return;
+    }
+
+    m_HighScore = m_Score;
+
+    std::ofstream file(HIGH_SCORE_FILE);
+    if (file.is_open())
+    {
+        file << m_HighScore;
+    }
+    else
+    {
+        std::cout << "Failed to save high score to " << HIGH_SCORE_FILE << std::endl;
+    }
+}
+
+void AsteroidsScene::onDebugUI()
+{
+    if (!m_IsDebugWindowActive)
+    {
+        return;
+    }
+
+    ImGui::Begin("Debug");
+
+    ImGui::Text("Score: %d", m_Score);
+    ImGui::Text("High Score: %d", m_HighScore);
+    ImGui::Separator();
+
+    ImGui::Text("FPS: %.1f (%.2f ms/frame)", 1.0f / Apex::Time::getDeltaTime(), Apex::Time::getDeltaTime() * 1000.0f);
+    ImGui::Text("Asteroids: %zu", m_Asteroids.size());
+    ImGui::Text("Projectiles: %zu", m_Projectiles.size());
+    ImGui::Text("Speed up percentage (progression) : %.2f", m_SpeedUpPercentage);
+    ImGui::Text("Asteroid spawn rate per second : %.2f", m_AsteroidSpawnRate);
+    ImGui::Separator();
+
+    ImGui::Checkbox("Show colliders", &m_IsGizmoEnabled);
+
+    ImGui::End();
 }

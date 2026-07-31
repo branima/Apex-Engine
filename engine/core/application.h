@@ -11,7 +11,7 @@ namespace Apex
     {
         public:
             Application();
-            ~Application() = default;
+            ~Application();
 
             void run();
 

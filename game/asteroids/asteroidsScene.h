@@ -23,6 +23,7 @@ class AsteroidsScene : public Apex::Scene
         void update() override;
         void onRender() override;
         void reset() override;
+        void onDebugUI() override;
 
         static constexpr float SCENE_WIDTH = 1200.0f;
         static constexpr float SCENE_HEIGHT = 800.0f;
@@ -40,13 +41,19 @@ class AsteroidsScene : public Apex::Scene
     private:
         void spawnProjectile();
         void spawnAsteroid();
-        void spawnAsteroids();
+        void spawnAsteroids(float currentTime);
         void asteroidSplit(const Asteroid& asteroid);
         void checkOutOfScreenObjects();
         void removeObjectsQueuedForDestruction();
 
         void objectMove();
-        void processCollisions();
+        void processCollisions(float currentTime);
+
+        void progressionStep(float currentTime);
+
+        int getScoreForCategory(AsteroidCategory category) const;
+        void loadHighScore();
+        void saveHighScore();
 
         std::shared_ptr<Apex::Texture> m_ShipTexture = std::make_shared<Apex::Texture>("resources/textures/ship.png");
         std::shared_ptr<Apex::Texture> m_ProjectileTexture = std::make_shared<Apex::Texture>("resources/textures/missile.png");
@@ -73,7 +80,18 @@ class AsteroidsScene : public Apex::Scene
         float m_LastAsteroidSpawnTime {-1000.0f}; // Forcing immediate spawn on engine startup
         float m_AsteroidSpawnRate {0.5f}; // Asteroids per second.
 
+        // Score
+        int m_Score{0};
+        int m_HighScore{0};
+        static constexpr const char* HIGH_SCORE_FILE = "saveFile.txt";
+
         // General
         GameState m_State {GameState::Invalid};
-        bool m_IsDebugActive {false};
+        bool m_IsGizmoEnabled {false};
+        bool m_IsDebugWindowActive {false};
+
+        float m_LastGameSpeedUpTime {0.0f}; // Last time stamp where the game had sped up
+        float m_SpeedUpTimer {15.0f}; // After how many seconds will game speed up again
+        float m_SpeedUpStep {0.05f};
+        float m_SpeedUpPercentage {0.0f}; // Asteroid speed and spawn rate are increased by this percentage -> game progression
 };

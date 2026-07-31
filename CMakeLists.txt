@@ -12,7 +12,13 @@ FetchContent_Declare(
     GIT_TAG 3.4
 )
 
-FetchContent_MakeAvailable(glfw)
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG v1.90.9
+)
+
+FetchContent_MakeAvailable(glfw imgui)
 
 add_executable(ApexEngine
     engine/core/application.cpp
@@ -20,6 +26,7 @@ add_executable(ApexEngine
     engine/core/circlecollider.cpp
     engine/core/collisionhelper.cpp
     engine/core/debugrenderer.cpp
+    engine/core/imguilayer.cpp
     engine/core/input.cpp
     engine/core/renderer.cpp
     engine/core/scene.cpp
@@ -41,6 +48,12 @@ add_executable(ApexEngine
     game/demoscene.cpp
     src/main.cpp
     src/stb_image.cpp
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
 
 target_include_directories(ApexEngine PRIVATE
@@ -50,6 +63,8 @@ target_include_directories(ApexEngine PRIVATE
     external/glm
     game
     game/asteroids
+    ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
 )
 
 target_link_libraries(ApexEngine PRIVATE

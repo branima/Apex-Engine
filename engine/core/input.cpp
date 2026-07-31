@@ -14,10 +14,12 @@
         return GLFW_KEY_S;
     case Key::D:
         return GLFW_KEY_D;
-    case Key::Space:
-        return GLFW_KEY_SPACE;
     case Key::C:
         return GLFW_KEY_C;
+    case Key::TAB:
+        return GLFW_KEY_TAB;
+    case Key::Space:
+        return GLFW_KEY_SPACE;
     case Key::Escape:
         return GLFW_KEY_ESCAPE;
     case Key::MouseLeftClick:
@@ -27,11 +29,18 @@
     }
 }
 
-/* static */ Apex::Math::Vec2 Apex::Input::getCursorPosition(const Window& window)
+/* static */ Apex::Math::Vec2 Apex::Input::getCursorPosition(const Window& window, float virtualWidth, float virtualHeight)
 {
     double x, y;
     glfwGetCursorPos(window.getWindowInstance(), &x, &y);
-    return Math::Vec2(static_cast<float>(x), static_cast<float>(y));
+
+    int windowWidth, windowHeight;
+    glfwGetWindowSize(window.getWindowInstance(), &windowWidth, &windowHeight);
+
+    const float scaleX = virtualWidth / static_cast<float>(windowWidth);
+    const float scaleY = virtualHeight / static_cast<float>(windowHeight);
+
+    return Math::Vec2(static_cast<float>(x) * scaleX, static_cast<float>(y) * scaleY);
 }
 
 /* static */  bool Apex::Input::isKeyHeld(Key key) { return ms_KeysHeld[getGLFWKey(key)]; }

@@ -16,6 +16,8 @@ namespace Apex
             virtual void onRender() = 0;
             virtual void reset() = 0;
 
+            virtual void onDebugUI() {}
+
             bool isObjectOutOfScene(const Transform& transform) const;
 
             virtual float getWidth() const = 0;

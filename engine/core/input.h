@@ -19,7 +19,7 @@ namespace Apex
             static bool isMouseButtonPressed(Key button);
             static bool isMouseButtonReleased(Key button);
 
-            static Math::Vec2 getCursorPosition(const Window& window);
+            static Math::Vec2 getCursorPosition(const Window& window, float virtualWidth, float virtualHeight);
 
             static void keyCallback(GLFWwindow* w, int key, int scancode, int action, int mods);
             static void mouseButtonCallback(GLFWwindow* w, int button, int action, int mods);
